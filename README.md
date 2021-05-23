@@ -8,6 +8,42 @@ Spécifications et design d'un gestionnaire de mots de passe centralisé sans ti
 
 ## Sommaire
 
+## Utilité du gestionnaire de mots de passe
+
+## Comparaison 
+
+### Critères
+
+### Gestionnaires de mots de passe
+
+## Solution
+
+### Stockage des mots de passe
+
+KeePass / pass
+
+### Gestion de version
+
+Git
+
+### Synchronisation pair-à-pair
+
+WebRTC
+
+### Résolution NAT
+
+WebRTC
+
+### Chiffrement de bout-en-bout
+
+Double Ratchet et Sésame du Signal Protocol
+
+---
+
+<!-- ancienne version -->
+
+## Sommaire
+
 [toc]
 
 ## Pourquoi un gestionnaire de mots de passe ?
