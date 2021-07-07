@@ -1,4 +1,4 @@
-# 	Synchronized-Decentralized-Password-Manager
+# 		Synchronized-Decentralized-Password-Manager
 
 Spécifications et design d'un gestionnaire de mots de passe décentralisé sans tiers de confiance
 
@@ -152,48 +152,52 @@ Assez parlé de théorie ! Dans cette section, nous allons nous intéresser aux 
 
 ### Critères
 
-Dans un premier temps, nous 
+Dans un premier temps, nous
 
 Pour l'instant, nous cherchons à ratisser large, nous ne prenons donc pas en compte des critères trop élaborés en lien avec des fonctionnalités.
 
 Voici quels sont nos critères pour cette comparaison :
 
-*   Licence
-*   Open source
-*   Fonctionnement
-*   OS
-*   Accès public au fichier chiffré
-*   Synchronisation
-*   Protection des données
+*   **Licence** : *propriétaire*, *freemium*, *libre*
+*   **Open source **: *oui*, *non*
+*   **Fonctionnement** : *local*, *serveur*, *stateless*, *git*, *blockchain*
+*   **OS** : *navigateur*, *Windows*, *macOS*, *Linux*, *Android*, *iOS*
+*   **Accès public au fichier chiffré** : *possible*, *connexion requise*, *impossible*
+*   **Synchronisation** :  *oui*, *non*
+*   **Vie privée** : *Compte obligatoire*, *compte facultatif*, *compte inexistant*
 
 Maintenant ces critères établis, passons à la comparaison à proprement parler.
 
 ### Gestionnaires de mots de passe
 
-*   1Password
-*   Bitwarden
-*   Dashlane
-*   KeePassXC
-*   NordPass
-*   Remembear
-*   Enpass
-*   Keeper 
-*   pass
-*   Password store
-*   Google
-*   You.
-*   Safeguard
-*   LastPass
-*   KeePass
-*   Keeper
-*   LockSelf
-*   LessPass
-*   PassBolt
-*   Password Safe
+|     Gestionnaire      |           Licence            | Open Source |     Fonctionnement     |                              OS                              |          Accès public           | Synchronisation  |        Vie privée        |
+| :-------------------: | :--------------------------: | :---------: | :--------------------: | :----------------------------------------------------------: | :-----------------------------: | :--------------: | :----------------------: |
+|       1Password       |         propriétaire         |     non     |        serveur         |       navigateur, Android, iOS, Linux, macOS, Windows        |            connexion            |       oui        |       obligatoire        |
+|       Bitwarden       |  libre (AGPLv3 / GNU GPLv3)  |     oui     |        serveur         |       navigateur, Android, iOS, Linux, macOS, Windows        |            connexion            |       oui        |       obligatoire        |
+|       Dashlane        |   propriétaire / freemium    |     non     |        serveur         |           navigateur, Android, iOS, macOS, Windows           |            connexion            |       oui        |       obligatoire        |
+|        Enpass         |         propriétaire         |     non     |        serveur         |       navigateur, Android, iOS, Linux, macOS, Windows        |            connexion            |       oui        |       obligatoire        |
+|       Entropass       |         libre (MIT)          |     oui     |       stateless        |                          navigateur                          |           impossible            |       oui        |        inexistant        |
+|   Firefox Lockwise    |       libre (MPL 2.0)        |     oui     |        serveur         |                   navigateur, Android, iOS                   |            connexion            |       oui        |       obligatoire        |
+|    Google Password    |         propriétaire         |     non     |        serveur         |                     navigateur, Android                      |            connexion            |       oui        |       obligatoire        |
+|        KeePass        |        libre (GPLv2)         |     oui     |         local          | navigateur, Android, iOS (extensions), Linux, macOS, Windows |           impossible            | oui (extensions) |        inexistant        |
+|        Keeper         |   propriétaire / freemium    |     non     |        serveur         |              navigateur, macOS, Linux, Windows               |            connexion            |       oui        |       obligatoire        |
+|       Keychain        |        libre (GPLv2)         |     non     |        serveur         |                          iOS, macOS                          |            connexion            |       oui        |       obligatoire        |
+|       LastPass        |   propriétaire / freemium    |     non     |        serveur         |                          navigateur                          |            connexion            |       oui        |       obligatoire        |
+|       LessPass        |        libre (GPLv3)         |     oui     |       stateless        |                          navigateur                          |           impossible            |       oui        |        facultatif        |
+|       LockPass        |         propriétaire         |     non     |        serveur         |                          navigateur                          |            connexion            |       oui        |       obligatoire        |
+|       NordPass        |   propriétaire / freemium    |     non     |        serveur         |                          navigateur                          |            connexion            |       oui        |       obligatoire        |
+| Pass (Password store) |        libre (GPLv2+)        |     oui     |          git           |    navigateur, Android, iOS, Windows (extensions), Linux     | connexion (selon configuration) | oui (avec tiers) |        inexistant        |
+|       PassBolt        |        libre (AGPL-3)        |     oui     | serveur (réseau local) |                          navigateur                          |            connexion            |       oui        | obligatoire (entreprise) |
+|     Password Safe     | libre (Artistic License 2.0) |     oui     |         local          |                    maxOS, Linux, Windows                     |           impossible            |       non        |        inexistant        |
+|       Remembear       |         propriétaire         |     non     |        serveur         |       navigateur, Android, iOS, Linux, macOS, Windows        |            connexion            |       oui        |       obligatoire        |
+|       Safeguard       |         propriétaire         |     non     |       blockchain       |                          navigateur                          |            possible             |       oui        |       obligatoire        |
+|         You.          |         propriétaire         |     non     |       blockchain       |                   navigateur, Android, iOS                   |            possible             |       oui        |       obligatoire        |
 
 ### Conclusion
 
-TODO: faire dabord la comparaison et faire la suite UNIQUEMENT si aucun résultat n'est pertinent ou satisfaisant
+Le résultat de cette comparaison est qu'il n'existe pas gestionnaires de mots de passe qui soit à la fois gratuit et simple d'utilisation, qui synchronise les mots de passe entre les appareils automatiquement et qui ne passe pas par un tiers de confiance.
+
+Le but des paragraphes suivants est de définir et concevoir un gestionnaire de mots de passe qui réponde à ce besoin.
 
 ## Solution
 
@@ -232,14 +236,14 @@ TODO: pomper les fonctionnalités sur la comparaison Wikipédia et sur les autre
 
 ```mermaid
 graph LR
-subgraph server side
-db[(database)]
-end
-subgraph user side
-id1(login & password) & id2(login & password) & etc(...)
-key>master password] & id1 & id2 & etc --> encryption
+subgraph laptop user side
+id11(login & password) & id12(login & password) & etc1(...)
+key1>master password] & id11 & id12 & etc1 --> encryption
 encryption --> cipher(encrypted file)
 end
-cipher ---> |Stored| db
+subgraph smartphone user side
+cipher --> |QR code| decryption
+id21(login & password) & id22(login & password) & etc2(...)
+key2>master password] --> decryption --> id21 & id22 & etc2
+end
 ```
-
