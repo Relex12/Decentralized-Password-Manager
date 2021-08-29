@@ -1,18 +1,32 @@
-# 		Synchronized-Decentralized-Password-Manager
+# Decentralized-Password-Manager
 
-Spécifications et design d'un gestionnaire de mots de passe décentralisé sans tiers de confiance
+Spécifications et design d'un gestionnaire de mots de passe décentralisé synchronisé sans tiers de confiance 
 
-![](https://img.shields.io/github/license/Relex12/Zero-Knowledge-Password-Manager-Design) ![](https://img.shields.io/github/repo-size/Relex12/Zero-Knowledge-Password-Manager-Design) ![](https://img.shields.io/github/languages/top/Relex12/Zero-Knowledge-Password-Manager-Design) ![](https://img.shields.io/github/last-commit/Relex12/Zero-Knowledge-Password-Manager-Design) ![](https://img.shields.io/github/stars/Relex12/Zero-Knowledge-Password-Manager-Design)
+![](https://img.shields.io/github/license/Relex12/Decentralized-Password-Manager) ![](https://img.shields.io/github/repo-size/Relex12/Decentralized-Password-Manager) ![](https://img.shields.io/github/languages/top/Relex12/Decentralized-Password-Manager) ![](https://img.shields.io/github/last-commit/Relex12/Decentralized-Password-Manager) ![](https://img.shields.io/github/stars/Relex12/Decentralized-Password-Manager)
 
-Regarder sur GitHub
+[Regarder sur GitHub](https://github.com/Relex12/Decentralized-Password-Manager)
 
-[![Zero-Knowledge-Password-Manager-Design](https://github-readme-stats.vercel.app/api/pin/?username=Relex12&repo=Zero-Knowledge-Password-Manager-Design)](https://github.com/Relex12/Zero-Knowledge-Password-Manager-Design)
+[![Decentralized-Password-Manager](https://github-readme-stats.vercel.app/api/pin/?username=Relex12&repo=Decentralized-Password-Manager)](https://github.com/Relex12/https://github.com/Relex12/Decentralized-Password-Manager)
 
 ---
 
 ## Sommaire
 
-[toc]
+* [Decentralized-Password-Manager](#decentralized-password-manager)
+    * [Sommaire](#sommaire)
+    * [Utilité du gestionnaire de mots de passe](#utilité-du-gestionnaire-de-mots-de-passe)
+    * [Fonctionnement](#fonctionnement)
+        * [Fichier chiffré sur le disque](#fichier-chiffré-sur-le-disque)
+        * [Synchronisation via un serveur](#synchronisation-via-un-serveur)
+        * [Solution stateless](#solution-stateless)
+        * [Basé sur un dépôt Git](#basé-sur-un-dépôt-git)
+        * [Basé sur la Blockchain](#basé-sur-la-blockchain)
+    * [Comparaison](#comparaison)
+        * [Critères](#critères)
+        * [Gestionnaires de mots de passe](#gestionnaires-de-mots-de-passe)
+        * [Conclusion](#conclusion)
+
+<!-- table of contents created by Adrian Bonnet, see https://Relex12.github.io/Markdown-Table-of-Contents for more -->
 
 ## Utilité du gestionnaire de mots de passe
 
@@ -80,7 +94,7 @@ C'est le fonctionnement de base d'un gestionnaire de mots de passe. Tous vos mot
 
 Une fois que vous avez besoin d'accéder à vos mots de passe, pour vous connecter quelque part par exemple, il vous suffit de rentrer votre mot de passe maître dans votre gestionnaire de mot de passe pour déchiffrer le fichier qui contient tous vos mots de passe.
 
-![](img/encrypted-file.png)
+![](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/encrypted-file.png)
 
 *Exemple* : KeePass
 
@@ -94,9 +108,9 @@ Pour parvenir à synchroniser vos mots de passe entre différents appareils, de 
 
 Ici le service qui vous est vendu, c'est celui d'avoir à disposition, dans un serveur d'une entreprise privée, vos mots de passe sous la forme d'un fichier chiffré. Ainsi, n'importe où dans le monde et à n'importe quel moment, vous pouvez vous connecter à votre compte et récupérer vos mots de passe. De la même manière, quand vous ajoutez des nouveaux mots de passe, le fichier chiffré est mis à jour, la synchronisation est donc totale.
 
-![](img/server-stored.png)
+![](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/server-stored.png)
 
-![](img/server-pulled.png)
+![](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/server-pulled.png)
 
 *Exemples* : 1PassWord, BitWarden, NordPass, Dashlane, etc.
 
@@ -109,7 +123,7 @@ Ici le service qui vous est vendu, c'est celui d'avoir à disposition, dans un s
 
 Puisque le problème est de stocker le fichier chiffré quelque part, les solutions stateless proposent une toute nouvelle approche : au lieu de stocker les mots de passe pour que vous puissiez y accéder pour vous connecter sur vos sites, il est question ici de *calculer* vos mots de passe à partir de votre mot de passe maître et d'informations comme le nom du site. Plus besoin de *stocker* vos mots de passe : comme le mot de passe de votre site est *calculé*, il vous suffit de fournir les mêmes informations d'une connexion sur l'autre avoir votre mot de passe.
 
-![](img/stateless.png)
+![](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/stateless.png)
 
 *Exemple* : LessPass
 
@@ -152,9 +166,7 @@ Assez parlé de théorie ! Dans cette section, nous allons nous intéresser aux 
 
 ### Critères
 
-Dans un premier temps, nous
-
-Pour l'instant, nous cherchons à ratisser large, nous ne prenons donc pas en compte des critères trop élaborés en lien avec des fonctionnalités.
+Dans un premier temps, nous prenons pas en compte des critères trop élaborés en lien avec des fonctionnalités, nous nous limitons à des éléments basiques.
 
 Voici quels sont nos critères pour cette comparaison :
 
@@ -196,54 +208,3 @@ Maintenant ces critères établis, passons à la comparaison à proprement parle
 ### Conclusion
 
 Le résultat de cette comparaison est qu'il n'existe pas gestionnaires de mots de passe qui soit à la fois gratuit et simple d'utilisation, qui synchronise les mots de passe entre les appareils automatiquement et qui ne passe pas par un tiers de confiance.
-
-Le but des paragraphes suivants est de définir et concevoir un gestionnaire de mots de passe qui réponde à ce besoin.
-
-## Solution
-
-### Stockage des mots de passe
-
-KeePass / pass
-
-### Gestion de version
-
-Git
-
-### Synchronisation pair-à-pair
-
-WebRTC
-
-### Résolution NAT
-
-WebRTC
-
-### Chiffrement de bout-en-bout
-
-Double Ratchet et Sésame du Signal Protocol
-
-## Fonctionnalités
-
-[...]
-
-*   extension sur navigateur, application + processus démon sur smartphone
-*   mémorisation du mot de passe maître pendant 14 jours
-*   récupération et déchiffrement automatique à l'ouverture
-*   remplissage automatique des informations sur le site
-
-TODO: pomper les fonctionnalités sur la comparaison Wikipédia et sur les autres solutions
-
-## Exemple diagramme
-
-```mermaid
-graph LR
-subgraph laptop user side
-id11(login & password) & id12(login & password) & etc1(...)
-key1>master password] & id11 & id12 & etc1 --> encryption
-encryption --> cipher(encrypted file)
-end
-subgraph smartphone user side
-cipher --> |QR code| decryption
-id21(login & password) & id22(login & password) & etc2(...)
-key2>master password] --> decryption --> id21 & id22 & etc2
-end
-```
