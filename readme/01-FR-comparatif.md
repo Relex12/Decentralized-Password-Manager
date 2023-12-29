@@ -162,7 +162,7 @@ Dans un premier temps, nous prenons pas en compte des critères trop élaborés 
 Voici quels sont nos critères pour cette comparaison :
 
 *   **Licence** : *propriétaire*, *freemium*, *libre*
-*   **Open source **: *oui*, *non*
+*   **Open source** : *oui*, *non*
 *   **Fonctionnement** : *local*, *serveur*, *stateless*, *git*, *blockchain*
 *   **OS** : *navigateur*, *Windows*, *macOS*, *Linux*, *Android*, *iOS*
 *   **Accès public au fichier chiffré** : *possible*, *connexion requise*, *impossible*
