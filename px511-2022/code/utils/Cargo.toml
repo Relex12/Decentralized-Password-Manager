@@ -1,0 +1,13 @@
+[package]
+name = "utils"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+serde = { version = "1.0.147", features = ["derive"] }
+serde_json = "1.0.85"
+rand_core = {version="0.6.4", features = ["getrandom"]}
+k256 = {version="0.11.6", features=["ecdh", "serde", "pem"]}
+colored = "2"
