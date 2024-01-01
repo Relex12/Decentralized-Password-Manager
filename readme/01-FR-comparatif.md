@@ -91,7 +91,7 @@ Une fois que vous avez besoin d'accéder à vos mots de passe, pour vous connect
 
 **Désavantage** :
 
-*   Vos mots de passe sont stockés sur l'espace disque d'un seul appareil, votre ordinateur ou votre smartphone. **Vous ne pouvez pas** accéder à vos mots de passe depuis un autre appareil. Notamment, **il n'y a pas de synchronisation** entre vos appareils. Cette contrainte implique que ce type de gestionnaires de mots de passe est peu utilisé dans le grand public.  
+*   Vos mots de passe sont stockés sur l'espace disque d'un seul appareil, votre ordinateur ou votre smartphone. **Vous ne pouvez pas** accéder à vos mots de passe depuis un autre appareil. Notamment, **il n'y a pas de synchronisation** entre vos appareils. Cette contrainte implique que ce type de gestionnaires de mots de passe est peu utilisé dans le grand public.
 
 ### Synchronisation via un serveur
 
