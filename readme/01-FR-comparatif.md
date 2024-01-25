@@ -1,21 +1,26 @@
 # Comparatif
 
-Spécifications et design d'un gestionnaire de mots de passe décentralisé synchronisé sans tiers de confiance
+Comparaison des gestionnaires de mots de passe existants et de leurs modes de fonctionnement
+
+[Menu principal](https://relex12.github.io/fr/Decentralized-Password-Manager)
+
+[Page suivante : Solutions](https://relex12.github.io/fr/Decentralized-Password-Manager/Solutions)
 
 ## Sommaire
 
-* [Utilité du gestionnaire de mots de passe](#utilité-du-gestionnaire-de-mots-de-passe)
-* [Fonctionnement](#fonctionnement)
-    * [Fichier chiffré sur le disque](#fichier-chiffré-sur-le-disque)
-    * [Synchronisation via un serveur](#synchronisation-via-un-serveur)
-    * [Solution stateless](#solution-stateless)
-    * [Basé sur un dépôt Git](#basé-sur-un-dépôt-git)
-    * [Basé sur la Blockchain](#basé-sur-la-blockchain)
-
-* [Comparaison](#comparaison)
-    * [Critères](#critères)
-    * [Gestionnaires de mots de passe](#gestionnaires-de-mots-de-passe)
-    * [Conclusion](#conclusion)
+* [Comparatif](#comparatif)
+    * [Sommaire](#sommaire)
+    * [Utilité du gestionnaire de mots de passe](#utilité-du-gestionnaire-de-mots-de-passe)
+    * [Fonctionnement](#fonctionnement)
+        * [Fichier chiffré sur le disque](#fichier-chiffré-sur-le-disque)
+        * [Synchronisation via un serveur](#synchronisation-via-un-serveur)
+        * [Solution stateless](#solution-stateless)
+        * [Basé sur un dépôt Git](#basé-sur-un-dépôt-git)
+        * [Basé sur la Blockchain](#basé-sur-la-blockchain)
+    * [Comparaison](#comparaison)
+        * [Critères](#critères)
+        * [Gestionnaires de mots de passe](#gestionnaires-de-mots-de-passe)
+        * [Conclusion](#conclusion)
 
 <!-- table of contents created by Adrian Bonnet, see https://Relex12.github.io/Markdown-Table-of-Contents for more -->
 
@@ -33,12 +38,12 @@ Ces bonnes pratiques[^3] sont :
 
 *   12 caractères minimum
 *   des chiffres, des lettres majuscules et minuscule et des caractères spéciaux
-*   pas de lien logique entre les caractères (dates, mots d'une langue, etc...)
-*   pas de permutation (les *E* en *3*, *a* en *@*, *o* en *0*, etc...)
+*   pas de lien logique entre les caractères (dates, mots d'une langue, etc.)
+*   pas de permutation (les *E* en *3*, *a* en *@*, *o* en *0*, etc.)
 
 Et le point le plus important est le suivant :
 
-*   pas de lien logique entre les mots de passe (réutilisation, modification, permutation, etc...)
+*   pas de lien logique entre les mots de passe (réutilisation, modification, permutation, etc.)
 
 > Je respecte plusieurs points de la liste, ça suffit non ?
 

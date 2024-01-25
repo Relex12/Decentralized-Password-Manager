@@ -1,6 +1,15 @@
 # Solutions techniques
 
+Étude des solutions pour la synchronisation des données sans stockage centralisé
+
+[Page précédente : Comparatif](https://relex12.github.io/fr/Decentralized-Password-Manager/Comparatif)
+
+[Page suivante : Spécifications](https://relex12.github.io/fr/Decentralized-Password-Manager/Specifications)
+
+## Sommaire
+
 * [Solutions techniques](#solutions-techniques)
+    * [Sommaire](#sommaire)
     * [Communication sans serveur](#communication-sans-serveur)
         * [ Comparaison](#-comparaison)
         * [ Solutions non retenues](#-solutions-non-retenues)
