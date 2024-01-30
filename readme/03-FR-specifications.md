@@ -4,7 +4,7 @@ Spécifications de la solution retenue et des implications pratiques
 
 [Page précédente : Solutions](https://relex12.github.io/fr/Decentralized-Password-Manager/Solutions)
 
-[Page suivante : Fonctionnalités](https://relex12.github.io/fr/Decentralized-Password-Manager/Fonctionnalites)
+[Page suivante : Sécurité](https://relex12.github.io/fr/Decentralized-Password-Manager/Securite)
 
 ## Sommaire
 
@@ -31,6 +31,8 @@ Tout utilisateur qui souhaite communiquer avec le serveur doit au préalable s'�
 Sur chacun de ses appareils, l'utilisateur doit enregistrer le client auprès du serveur. L'enregistrement vaut pour un coffre à l'intérieur d'un client depuis un appareil. Si l'utilisateur ajoute un autre coffre sur un de ses clients, il doit de nouveau procéder à l'enregistrement depuis son appareil. L'utilisateur peut enregistrer en une seule fois plusieurs coffres auprès du serveur, les demandes d'enregistrement sont alors envoyées en parallèle au serveur, mais un seul challenge lui sera demandé pour valider l'ajout de tous les coffres.
 
 Du point de vue du serveur, chaque demande d'enregistrement est composée d'un identifiant utilisateur, de la clé publique du client et d'un identifiant de coffre mis bout à bout, ce qui forme la clé d'enregistrement `user_id:client_public_key:vault_id`. La clé d'enregistrement sera utilisée aussi bien pour vérifier que les messages entrants proviennent d'un appareil enregistré que pour vérifier que les appareils destinataires de ce message sont également tous enregistrés.
+
+> TODO: est-ce que la clé d'enregistrement ne doit pas être hachée pour les futures utilisations ? Comme ça le serveur n'est pas capable de déterminer quel user_id a envoyé des messages quel jour à quelle heure
 
 L'identifiant de l'utilisateur `user_id` doit permettre de contacter l'utilisateur via un service tiers afin de s'assurer de son identité, il s'agit d'une adresse email ou d'un numéro de téléphone portable. L'adresse email offre l'avantage de la gratuité d'envoi des mail pour le serveur, vis-àvis du numéro de téléphone qui vérifie mieux l'identité de l'utilisateur (il est moins facile d'avoir un nouveau numéro de téléphone qu'une nouvelle adresse email) mais qui nécessite de passer par un tier payant pour envoyer des SMS. Pendant le développement, l'identifiant utilisateur sera une adresse email, à termes cela pourrait évoluer vers un numéro de téléphone. 
 
@@ -63,12 +65,12 @@ sequenceDiagram
 
 Le filtre de Bloom est une structure de données atypique par son aspect probabiliste. Le filtre de Bloom ne supporte que deux opéarions : l'écriture d'une nouvelle entrée dans la structure et le test de présence d'une entrée. Il n'est pas possible de stocker des données dans cette structure, c'est pourquoi on parle de filtre.
 
-Soit $T$ un tableau de bits de taille $m$ dont toutes les cases sont initiées à 0 et $h$ une famille de $k$ fonctions de hachage cryptographique notées $h_k$ de taille $m$ bits. Donc pour tout $i$ entre 0 et $m$ et pour tout entrée $e$, la sortie de $h_i$ sur $e$ est compris entre 1 et $m$, ce qui correspond à une case du tableau $T$. On suppose que les fonctions de hachage $h_i$ ont été choisies afin de garantir une répartition statistiquement uniforme entre 1 et $m$. 
+Soit $T$ un tableau de bits de taille $m$ dont toutes les cases sont initiées à 0 et $h$ une famille de $k$ fonctions de hachage cryptographique notées $h_k$ de taille $m$ bits. Donc pour tout $i$ entre 0 et $m$ et pour tout entrée $e$, la sortie de $h_i$ sur $e$ est comprise entre 1 et $m$, ce qui correspond à une case du tableau $T$. On suppose que les fonctions de hachage $h_i$ ont été choisies afin de garantir une répartition statistiquement uniforme entre 1 et $m$. 
 
 Pour ajouter un élément dans la structure, il faut calculer successivement les $h_i$ sur cet élément pour $i$ allant de 1 à $m$ et affecter les cases correspondantes à la valeur 1.
 
 ```
-Fonction ajout(e)
+Fonction ajout_filtre(e)
 	Pour i de 1 à m
 		T[hi(e)] = 1
 	Fin Pour
@@ -78,10 +80,11 @@ Fin Fonction
 Pour tester la présence d'un élément, il faut calculer les $h_i$ sur cet élément et vérifier que toutes les cases correspondantes ont la valeur 1. Si au moins une case est à la valeur 0, alors l'élément n'est pas présent.
 
 ```
-Fonction test(e)
+Fonction test_filtre(e)
 	Pour i de 1 à m
 		Si T[hi(e)] = 0 alors
 			Retourner Faux
+		Fin Si
 	Fin Pour
 	Retourner Vrai
 Fin Fonction
@@ -122,18 +125,123 @@ Les utilisateurs qui tenteront de communiquer avec le serveur après une périod
 
 > Si le protocole de chiffrement avec le serveur utilise un Double Ratchet, le client doit à ce moment réinitialiser ses compteurs afin de pouvoir communiquer avec le serveur.
 
-### Partage du coffre entre clients
+### Découvert des clients
 
-Comme le serveur n'enregistre aucune donnée sur les clients, il n'est pas possible pour un client de "découvrir" les autres appareils avec lesquels partager un coffre via le serveur. La découverte est prise dans un sens de connaissance des clés publiques des autres clients, il n'y a pas de notion d'adresse puisque leurs moyens communication sont via le serveur ou manuellement via Bluetooth, QR Code ou ICE. Comme ce sont les clients qui décrivent au serveur les appareils auxquels délivrer chaque message, la communication à travers le serveur ne peut pas être utilisée pour cette découverte.
+Comme le serveur n'enregistre aucune donnée sur les clients, il n'est pas possible pour un client de "découvrir" les autres appareils avec lesquels partager un coffre en passant le serveur sans avoir au préalable échangé les clés. Le terme découverte est pris dans le sens de la connaissance des clés publiques des autres clients, ainsi que de quelques caractéristiques (nom affiché à l'utilisateur, etc.), il n'y a pas de notion d'adresse.
 
-L'utilisateur doit donc connecter ses appareils entre eux en plus de les enregistrer auprès du serveur. Chaque appareil doit être relié à chaque autre manuellement, il y a pour cela deux procédures :
+Les moyens de communication pour découvrir les clients sont nécessairement synchrones :
 
-* chaque appareil est relié à tous ceux qu'il ne connait pas encore : le premier appareil est relié à tous les autres, le deuxième à tous sauf le premier, *etc*... ;
-*  un appareil maître est relié à chaque appareil une première fois pour récolter leurs clés publiques, puis une seconde fois pour distribuer les clés.
+* **Bluetooth** : canal bidirectionnel, les deux appareils doivent le supporter
+* **QR Code** : canal unidirectionnel, seul l'appareil destinataire doit posséder une caméra
+* **Stockage externe** : canal unidirectionnel, les deux appareils doivent posséder des ports compatibles, l'utilisateur doit avoir un périphérique USB ou SD
+* **LAN** : canal bidirectionnel, les deux appareils doivent être sur le même réseau
+* **ICE** : canal bidirectionnel, pas de contrainte sur les appareils
 
-À noter que pour relier deux appareils, l'utilisateur doit manipuler les deux en même temps, c'est donc une opération peu ergonomique. Pour minimiser le nombre de liaisons à avoir, la première méthode est plus efficace pour deux à trois appareils, à partir de cinq c'est la seconde qui nécessite le moins d'opérations. Les clients mettront alors en avant la méthode la plus adapté pour l'utilisateur, mais les deux seront possibles. Il est à prévoir que la plupart des coffres seront créés sur un ou deux appareils avant d'être partagés avec plusieurs autres ultérieurement.
+Les canaux unidirectionnels peuvent être rendus bidirectionnels, soit en répétant le processus dans l'autre sens, soit plus simplement en passant par le serveur. Lorsqu'un appareil transmet sa clé publique à un autre via un canal unidirectionnel, ce dernier peut envoyer un message au serveur contenant sa propre clé publique avec pour destinataire le premier appareil. Celui-ci peut ensuite récupérer la clé publique de l'autre auprès du serveur. Ce message n'est pas chiffré de bout-en-bout entre les deux appareils mais n'a pas besoin de l'être., il n'est chiffré qu'entre les appareils et le serveur. Le serveur peut alors pratiquer une attaque de l'homme du milieu (*Man-in-the-Middle* ou *MitM*) et usurper l'identité de l'un des appareils auprès de l'autre. L'utilisateur sera alors amené à vérifier son numéro de sécurité sur les deux appareils suite à cet échange.
 
-Afin d'assurer à l'utilisateur que tous ses clients ont connaissance les un des autres, le calcul d'un numéro de sécurité prendra en compte le nombre et l'identité des clients qui partagent un coffre. L'utilisateur peut facilement vérifier que tous les clients sont reliés en vérifiant que ce numéro de sécurité est identique sur chacun d'entre eux.
+L'opération de découverte des clients est censée être synchrone. Lorsqu'un appareil envoie une clé publique à un autre via le serveur, le message correspondant sera stocké sur le serveur pendant une durée relativement courte, la date de péremption sera de l'ordre d'une dizaine de minutes. Au delà de ça, l'utilisateur devra de nouveau envoyer la clé depuis son appareil afin de la récupérer sur un autre autre. Plusieurs clés peuvent être envoyées de cette manière.
+
+L'utilisateur doit donc relier ses appareils entre eux en plus de les enregistrer auprès du serveur. Chaque appareil doit découvrir chaque autre manuellement, il y a pour cela deux procédures :
+
+* **méthode diffusion** : chaque appareil envoie toutes les identités qu'il connait à tous les appareils qu'il ne connait pas encore, chaque appareil répond toutes les identités qu'il connait et que l'autre appareil ne connait pas
+	```mermaid
+	sequenceDiagram
+	participant A as Appareil A
+	participant B as Appareil B
+	participant C as Appareil C
+	participant D as Appareil D
+	par
+		A ->> B: envoi la clé publique de A
+	and
+		B ->> A: envoi la clé publique de B
+	end
+	Note over A: connait B
+	Note over B: connait A
+	par
+		A ->> C: envoi les clés publiques de A et B
+	and
+		C ->> A: envoi la clé publique de C
+	end
+	Note over A: connait B et C
+	Note over C: connait A et B
+	par
+		A ->> D: envoi les clés publiques de A, B et C
+	and
+		D ->> A: envoi la clé publique de D
+	end
+	Note over A: connait B, C et D
+	Note over D: connait A, B et C
+	par
+		B ->> C: envoi les clés publiques de A et B
+	and
+		C ->> B: envoi la clé publique de C
+	end
+	Note over B: connait A et C
+	par
+		B ->> D: envoi les clés publiques de A, B et C
+	and
+		D ->> B: envoi la clé publique de D
+	end
+	Note over B: connait A, C et D
+	par
+		C ->> D: envoi les clés publiques de A, B et C
+	and
+		D ->> C: envoi la clé publique de D
+	end
+	Note over C: connait A, B et D
+	```
+  * *point négatif* : de nombreux messages sont inutiles
+  * *point négatif* : le très grand nombre d'échanges nécessaires, $n(n-1)$ pour $n$ appareils
+  * *point négatif* : les échanges doivent être bidirectionnels
+  * *point positif* : les échanges peuvent être réalisés dans n'importe quel ordre
+  
+* **méthode circulaire** : le premier appareil envoie son identité au deuxième, le deuxième envoie son identité et celle du premier au troisième, etc., jusqu'au dernier qui envoie toutes les identités au premier
+	```mermaid
+	sequenceDiagram
+	participant A as Appareil A
+	participant B as Appareil B
+	participant C as Appareil C
+	participant D as Appareil D
+	A ->> B: envoi la clé publique de A
+	B ->> C: envoi les clés publiques de A et B
+	C ->> D: envoi les clés publiques de A, B et C
+	D ->> A: envoi les clés publiques de A, B, C et D
+	```
+	* *point négatif* : les échanges doivent être réalisés dans un ordre précis
+	* *point positif* : le faible nombre d'échanges nécessaires, $n$ pour $n$ appareils
+	* *point positif* : les échanges peuvent être unidirectionnels
+	
+* **méthode maître** : dans un premier temps un appareil maître reçoit l'identité de chaque autre, ensuite le maître envoie toutes les identités à chacun
+	
+	```mermaid
+	sequenceDiagram
+	participant A as Appareil A
+	participant B as Appareil B
+	participant C as Appareil C
+	participant D as Appareil D
+	par
+		B ->> A: envoi la clé publique de B
+	and
+		C ->> A: envoi la clé publique de C
+	and
+		D ->> A: envoi la clé publique de D
+	end
+	par
+		A ->> B: envoi les clés publiques de A, B, C, et D
+	and
+		A ->> C: envoi les clés publiques de A, B, C, et D
+	and
+		A ->> D: envoi les clés publiques de A, B, C, et D
+	end
+  ```
+  * *point négatif* : le nombre d'échanges nécessaires, $2(n-1)$ pour $n$ appareils
+  * *point positif* : les échanges peuvent être unidirectionnels
+  * *point positif* : les échanges peuvent être réalisés dans n'importe quel ordre
+
+À noter que faire se découvrir deux appareils, l'utilisateur doit manipuler les deux en même temps, c'est donc une opération peu ergonomique. Pour minimiser le nombre transmissions à effectuer, la deuxième méthode est plus efficace, $n$ messages pour $n$ appareils contre $n(n-i)$ et $2(n-1)$. Mais la troisième méthode est plus pratique à utiliser car les échanges n'ont pas d'ordre précis et que le fonctionnement ne dépend pas du nombre d'appareils. Pour d'autres raisons, notamment la gestion des clients d'un coffre, il serait avantageux d'avoir recours à un appareil maître pour chaque coffre. Les clients pourront également supporter les autres méthodes qui pourront être réalisées entièrement ou en partie.
+
+
+Afin d'assurer à l'utilisateur que tous ses clients ont connaissance les un des autres, le calcul d'un numéro de sécurité prendra en compte le nombre et l'identité des clients qui partagent un coffre. L'utilisateur peut facilement vérifier que tous les clients sont reliés et qu'aucune attaque n'a été effectuée en vérifiant que ce numéro de sécurité est identique sur chacun d'entre eux.
 
 ## Communications
 
@@ -147,49 +255,244 @@ Pour offrir plus de sécurité, les messages ne doivent pouvoir être déchiffr�
 
 La clé qui permet de s'assurer que le chiffrement et déchiffrement a lieu depuis un client ayant le droit d'accès au coffre nécessite de mettre en place un secret partagé entre tous ces clients. Si tous les clients ayant accès à un coffre donné possèdent un secret relatif au coffre, seul un client ayant le droit d'accéder au coffre pourra le déchiffrer, indépendamment de la connaissance de l'utilisateur du mot de passe maître.
 
+##### Cas à deux appareils
+
 La création d'un tel secret est trivial dans le cas où il n'y a que deux appareils : l'échange de clés Diffie-Hellman, compatible avec la cryptographie sur les courbes elliptiques, permet à deux partis de se mettre d'accord sur une valeur commune en un seul tour. Cela signifie que deux côtés peuvent échanger des informations publiquement et parvenir à un secret partagé qu'ils sont les seuls à connaître. Ce secret peut à son tour être dérivé en une clé symétrique que l'on nomme clé partagée ou clé de session. Cette procédure est largement utilisée sur Internet via HTTPS, car le calcul de la clé partagée et son utilisation symétrique sont des calculs bien plus faciles à effecter qu'un chiffrement asymétrique.
 
 Cependant, l'utilisation de l'échange de clés Diffie-Hellman n'est possible que s'il n'y a que deux partis. Il n'existe pas de solution élégante largement reconnue dans le cas d'usage où d'avantages de clients souhaiteraient se mettre d'accord sur une valeur secrète. Le parti pris du protocole Signal est de réaliser un chiffrement pair-à-pair : lorsqu'un message est envoyé dans un groupe, il est en réalité chiffré de manière indépédante pour chaque destinataire puis chaque message ainsi chiffré est transmis au serveur, qui délivrera alors chaque version chiffrée au destinataire correspondant. C'est pour cette raison que lorsqu'un nouvel arrivant entre dans une conversation chiffrée de bout en bout, il n'a pas accès aux messages précédents.
 
 Ce fonctionnement implique qu'un message envoyé au serveur en attente de livraison doit être stocké autant de fois que le message possède de destinataire. S'il était possible de créer un secret partagé entre tous les clients, il n'y aura qu'un seul message à stocker du côté du serveur, dans l'attente de la livraison à chacun des clients. Or la charge de travail du serveur est un sujet primordial afin de mutualiser les coûts de fonctionnement de gestionnaire de mots de passe.
 
-Pour une utilisation sur trois appareils, il est possible d'utiliser la cryptographie à base de couplages
+##### Cas à trois appareils
 
+Pour une utilisation sur trois appareils, il est possible d'utiliser la cryptographie à base de couplages qui repose sur l'utilisation de plusieurs courbes elliptiques ainsi qu'une fonction nommée couplage sur ces courbes. En particulier, les couplages utilisés sont bilinéaires, ce qui permet à chaque utilisateur de manipuler les deux clés publiques des autres comme une seule.
 
+Ce domaine fait l'objet de recherches académiques, mais il n'existe pas encore d'application largement utilisée comme c'est le cas pour l'échange de clés Diffie-Hellman sur les courbes elliptiques. Pour plus d'informations, voir l'[étude sur les échanges de clés multipartites Diffie-Hellman](https://relex12.github.io/fr/3PBDH).
 
+##### Cas à $N$ appareils
 
-> TODO: parler de 3PBDH, renommer et modifier 3ECDH repo, faire un lien vers les travaux
+En l'état actuel des recherches scientifiques, la cryptographie à base de couplage n'est pas encore assez performante pour permettre à quatre appareils ou plus d'échanger une clé. Pour cela, il faudrait être en mesure de trouver des couplages avec pour ensemble de départ $N$ courbes elliptiques, mais il n'existe a priori pas de méthode pour trouver ces couplages.
 
-> TODO: trouver quoi faire des diagragmmes à N appareils dans 3PBDH.md (dans ce repo)
-> ajouter ici ou dans 3PBDH > README
+Dans notre cas d'usage, pour quatre appareils et plus, nous utiliserons un modèle d'échange de clé standard à base de Diffie-Hellman sur des courbes elliptiques. Plusieurs modèles de création de clé partagée avec leurs avantages et leurs inconvénients sont listés ci-dessous. Ces modèles supposent que les appareils connaissent au préalable les clés publiques de chacun, ce qui est le cas suite à la découverte des clients. Chaque message est envoyée de façon pair-à-pair, soit par le serveur, soit manuellement via Bluetooth, QR Code, ICE ou autre. Les messages passant par le serveur sont chiffrés de bout-en-bout entre les deux appareils et ont une date de péremption assez courte.
 
-> Nombre d'utilisateurs maximal et calcul de clé
+1. **clé partagée aléatoire créé par un appareil maître**
 
-
-#### Ajout d'un nouveau client
-
-> Ajout d'un nouvel utilisateur
-
-```mermaid
-sequenceDiagram
+	```mermaid
+	sequenceDiagram
 	participant A as Appareil A
 	participant B as Appareil B
 	participant C as Appareil C
 	participant D as Appareil D
-	participant E as Appareil E
-	Note left of A : calcul de la clé partagée
-```
+	Note over A: génère une clé partagée aléatoire
+	par
+		A ->> B: envoi de la clé partagée
+	and
+		A ->> C: envoi de la clé partagée
+	and
+		A ->> D: envoi de la clé partagée
+	end
+	```
 
-TODO: est-ce qu'il y a vraiment besoin d'un diagramme ?
+	* *point négatif* : la clé partagée est envoyée, il suffirait de casser le chiffrement d'un message pour compromettre toute la sécurité
+	* *point négatif* : la clé partagée est envoyée plusieurs fois avec différents chiffrements, ce qui peut faciliter une attaque 
+	* *point négatif* : la clé partagée est créée depuis un seul appareil, auquel les autres doivent faire confiance et dont la génération de nombre aléatoires pourrait être défaillante
+	* *point positif* : la procédure ne prend qu'un seul tour, les messages sont envoyés en parallèle
+	* *point positif* : le faible nombre de messages, $n-1$ pour $n$ appareils
+	* *point positif* : la procédure n'a pas besoin d'être réalisée de nouveau lors de l'ajout d'un nouvel appareil
+	* *point positif* : l'ajout d'un nouvel appareil peut être fait de manière synchrone depuis un seul appareil
+
+2. **clé partagée aléatoire créé conjointement par tous les appareils**
+
+	```mermaid
+	sequenceDiagram
+		participant A as Appareil A
+		participant B as Appareil B
+		participant C as Appareil C
+		participant D as Appareil D
+		par
+			Note over A: génère une partie aléatoire
+			par
+				A ->> B: envoi
+			and
+				A ->> C: envoi
+			and
+				A ->> D: envoi
+			end
+		and
+			Note over B: génère une partie aléatoire
+			par
+				B ->> A: envoi
+			and
+				B ->> C: envoi
+			and
+				B ->> D: envoi
+			end
+		and
+			Note over C: génère une partie aléatoire
+			par
+				C ->> A: envoi
+			and
+				C ->> B: envoi
+			and
+				C ->> D: envoi
+			end
+		and
+			Note over D: génère une partie aléatoire
+			par
+				D ->> A: envoi
+			and
+				D ->> B: envoi
+			and
+				D ->> C: envoi
+			end
+		end
+		par
+			Note over A: concaténation hachage et dérivation
+		and
+			Note over B: concaténation hachage et dérivation
+		and
+			Note over C: concaténation hachage et dérivation
+		and
+			Note over D: concaténation hachage et dérivation
+		end
+
+	```
+
+	* *point négatif* : la clé partagée est envoyée, il suffirait de casser le chiffrement de quelques messages pour compromettre toute la sécurité
+	* *point négatif* : le très grand nombre de messages, $n(n-1)$ pour $n$ appareils
+	* *point négatif* : l'ajout d'un nouvel appareil doit être fait de manière synchrone depuis tous les appareils
+	* *point positif* : la clé partagée est créée à partir de tous les appareils
+	* *point positif* : la procédure ne prend qu'un seul tour, les messages sont envoyés en parallèle
+	* *point positif* : la procédure n'a pas besoin d'être réalisée de nouveau lors de l'ajout d'un nouvel appareil
+
+3. **signature successive de la clé partagée coordonné par un appareil maître**
+
+	```mermaid
+	sequenceDiagram
+	participant A as Appareil A
+	participant B as Appareil B
+	participant C as Appareil C
+	participant D as Appareil D
+	Note over A: calcul de la clé partagée entre A et D
+	A ->> B: demande de signature
+	Note over B: calcul de la clé partagée entre A, B et D
+	B ->> A: envoi de la clé partagée entre A, B et D
+	A ->> C: demande de signature
+	Note over C: calcul de la clé partagée entre A, B, C et D
+	C ->> A: envoi de la clé partagée entre A, B, C et D
+	par
+		A ->> B: envoi de la clé partagée
+	and
+		A ->> C: envoi de la clé partagée
+	and
+		A ->> D: envoi de la clé partagée
+	end
+	```
+
+	* *point négatif* : la clé partagée est envoyée, il suffirait de casser le chiffrement d'un message pour compromettre toute la sécurité
+	* *point négatif* : le grand nombre de messages, $3n-5$ pour $n$ appareils
+	* *point négatif* : certains appareils connaissent des clés partagées desquelles ils ne font pas partie, exemple B connait la clé entre A et D
+	* *point négatif* : l'ajout d'un nouvel appareil doit être fait de manière synchrone depuis tous les appareils
+	* *point positif* : la clé partagée est créée à partir de tous les appareils
+
+4. **échanges de clés Diffie-Hellman circulaires**
+
+	```mermaid
+	sequenceDiagram
+		participant A as Appareil A
+		participant B as Appareil B
+		participant C as Appareil C
+		participant D as Appareil D
+		par
+			Note over A: calcul de la clé partagée entre A et D
+			A ->> B: envoi de la clé entre A et D
+		and
+			Note over B: calcul de la clé partagée entre A et B
+			B ->> C: envoi de la clé entre A et B
+		and
+			Note over C: calcul de la clé partagée entre B et C
+			C ->> D: envoi de la clé entre B et C
+		and
+			Note over D: calcul de la clé partagée entre C et D
+			D ->> A: envoi de la clé entre C et D
+		end
+	
+		par
+			Note over A: calcul de la clé partagée entre A, C et D
+			A ->> B: envoi de la clé entre A, C et D
+		and
+			Note over B: calcul de la clé partagée entre A, B et D
+			B ->> C: envoi de la clé entre A, B et D
+		and
+			Note over C: calcul de la clé partagée entre A, B et C
+			C ->> D: envoi de la clé entre A, B et C
+		and
+			Note over D: calcul de la clé partagée entre B, C et D
+			D ->> A: envoi de la clé entre B, C et D
+		end
+	
+		par
+			Note over A: calcul de la clé partagée
+		and
+			Note over B: calcul de la clé partagée
+		and
+			Note over C: calcul de la clé partagée
+		and
+			Note over D: calcul de la clé partagée
+		end
+	```
+
+	* *point négatif* : de nombreux appareils connaissent des clés partagées desquelles ils ne font pas partie, exemple B connait la clé entre A et D
+	* *point négatif* : le très grand nombre de messages, $n(n-2)$ pour $n$ appareils
+	* *point négatif* : l'ajout d'un nouvel appareil doit être fait de manière synchrone depuis tous les appareils
+	* *point positif* : la clé partagée est créée à partir de tous les appareils
+	* *point positif* : la clé partagée finale n'est pas envoyée
+
+##### Synthèse création de clé et nombre maximal d'utilisateurs
+
+Dans le cas où un coffre n'est partagé qu'entre deux à trois appareils, il n'y a pas de difficulté concernant la création d'une clé partagée. Pour quatre appareils ou plus, plusieurs options sont à envisager :
+
+* le nombre maximal d'appareils peut être limité à trois : l'utilisateur sera invité à créer différents coffres pour différents usages afin qu'aucun ne dépasse trois appareils
+* l'une des méthodes ci-dessus peut être implémentée : l'utilisateur devra réaliser un nombre important d'échanges entre tous ses appareils, il sera éventuellement mis en garde d'un risque de sécurité (quitte à n'autoriser dans le client que les méthodes qui minimisent le risque d'attaque comme le Bluetooth et le QR Code)
+* le service de nombreux appareils peut être payant : l'utilisateur pourra ajouter autant d'appareils qu'il souhaite, les messages seront chiffrés deux à deux ou trois à trois et stockés plusieurs fois dans le serveur mais ce service sera facturé en raison de l'utilisation des ressources du serveur
+* si la cryptographie à base de couplage permet une généralisation à $N$ appareils : un ensemble de couplages pourra être prédéfini pour $N$ allant de 3 à une valeur maximale, qui serait le nombre maximal d'appareils pour un coffre
+
+> L'option à favoriser pour l'implémentation du gestionnaire de mots de passe n'est pas encore sélectionnée.
+
+#### Ajout d'un nouveau client
+
+Lorsque l'utilisateur souhaite ajouter un nouvel appareil à son coffre, après l'avoir enregistré auprès du serveur, il doit annoncer l'appareil entrant à tous les appareils qui partagent déjà le coffre. L'appareil entrant doit envoyer son identité à chacun des autres appareils, et l'un des appareils déjà présents doit envoyer les identités de tous les appareils déjà présents à l'appareil entrant. Si l'appareil entrant a un difficulté à contacter l'un des autres appareils, son identité peut être retransmise par un appareil qui la possède déjà.
+
+Lorsqu'un nouvel appareil est ajouté au coffre, la clé partagée devient obsolète, une nouvelle clé partagée est calculée grâce aux méthodes décrites ci-dessus.
+
+#### Double Ratchet
+
+* une seule clé = si la clé est cassée, on peut tout déchiffrer
+* un seul ratchet (un seul KDF) = forward secrecy = si une clé est cassée, on peut déchiffrer tous les messages futurs, les messages passés sont sécurisé
+* deux ratchet = post-compromise security = sender creates a new private-public key, uses his new private key and receivers current public key to generate a new shared key, which is used as an entrypoint for KDF = si une clé est cassée, tous les messages envoyés d'affilée avec cette clé sont déchiffrables, les anciens messages et les futurs une fois que la clé aura changé (i.e. lorsque l'autre aura répondu) seront sécurisé
+* en plus du Diffie-Hellman ratchet, deux ratchet d'envoi et de réception ?= chiffrement des messages les uns après les autres avec un même Diffie-Hellman ratchet mais différentes clés ?= possibilité de déchiffrer des messages peut importe l'ordre d'arrivée pour peu qu'ils soient numérotés
 
 
-#### Double Ratchet ?
+
+> Problème : à priori, tant qu'il n'existe pas de moyen de calculer une clé partagée en un round, il n'est pas possible d'utiliser de double ratchet, et donc il est impossible de garantir la post-compromise security
+> Sinon, on peut garder la même clé et obliger à réinitialiser manuellement via les méthodes chiantes ci-dessus, auquel cas faire un paragraphe si la péremption des clés, le premier à s'en rendre compte, tout ça
+> TODO: modifier le cas à N appareils pour virer les méthodes compliquées et leurs diagrammes, peut-être les garder dans 3PBDH
+
+
 
 TODO: re regarder computerphile sur Signal : double ratchet, sésame
 relire le rapport de PX 2022
 
 Les clés de chiffrements peuvent être différentes : la clé partagée entre les clients et la clé dérivée du mot de passe maître
 Ainsi, l'utilisateur ne peut pas déchiffrer ses propres messages même en connaissant le mot de passe maitre, il faut à la fois de connaître de mot de passe maitre et être sur un appareil enregistré connaissant la clé partagée
+
+> Soit déplacer cette section plus haut, soit préciser dans un paragraphe que lors de l'ajout d'un nouvel appareil, la clé est reset et donc les compteurs le sont aussi
+
+#### Format des messages
+
+> git updates de fichiers de secret JSON bien définis
+> genre un champs obligatoire `value` et des champs optionnels `tags_list`, `url` et `username`
+> les dates `creation` et `last_used` stockées uniquement sur le client, pas transmises dans le coffre
 
 ### Communication avec le serveur
 
@@ -199,12 +502,90 @@ Gestion de la pile de messages à délivrer
 
 Sécurités pour attaques en bourrage de pile
 
-Double Ratchet ?
+#### Double Ratchet ?
 
 > Attention : lorsqu'un client envoi un message au serveur, s'il est déjà enregistré, il doit chiffrer / signer ses messages avec la clé publique du serveur pour que celui-ci vérifie que la clé publique utilisée pour ce message est identique à celle annoncée lors de l'enregistrement dans le filtre de Bloom
 > En pratique, on metttra en place un Double Ratchet à partir de la clé publique annoncée lors de l'enregistrement dans la table et la clé publique du serveur
 > Attention : le serveur doit alors conserver l'état des compteurs du Double Ratchet pour chaque appareil enregistré, noté avec sa clé d'enregistrement `user_id:client_public_key:vault_id`
 
+> Date de péremption TODO reformuler
 
-#### Date de péremption TODO reformuler
+### Stockage des messages
 
+Afin de retrouver rapidement les messages en attente pour un client donné, le serveur utilisera une table de hachage. Cette structure de données permet de stocker des données reliées à des clés en entrée. Dans notre cas, les clés seront les clés d'enregistrement des clients stockées dans le filtre de Bloom. D'une manière similaire au filtre, en calculant le résultat d'une fonction de hachage sur la clé, on obtient l'adresse d'une case de la table, cette case contient la valeur associée à la clé. Contrairement à une liste classique, il n'est pas nécessaire de parcourir la structure dans l'ordre pour trouver la valeur d'une clé. Si la valeur est vide, c'est que la clé ne contient pas de valeur associée.
+
+#### Fonctionnement de la table de hachage
+
+Soit $T$ une table de taille $m$, et $h$ une fonction de hachage cryptographique de taille $\log_2(m)$ de sorte que pour toute clé $e$, la sortie de $h$ sur $e$ est comprise entre 1 et $m$. Les cases de la table sont de taille identique $k$. La taille de la table est $m.k$.
+
+Pour ajouter une valeur $v$ associée à une clé $c$ dans la table, il faut calculer le résultat de la fonction de hachage sur la clé, et affecter la valeur $v$ à la case correspondante : $T[h(c)]=v$. Dans notre cas d'usage, il faut également que la valeur associée à une clé puisse être supprimée, auquel cas on nullifie la case. Pour rechercher une valeur à partir d'une clé, il suffit de faire le même calcul et de récupérer la valeur stockée à la case d'indice $h(c)$.
+
+En raison de l'utilisation d'une fonction de hachage cryptographique, comme pour le filtre de Bloom, il est possible d'avoir des collisions, c'est-à-dire que deux clés d'enregistrement soient associées via la fonction de hachage à la même valeur dans la table. Pour contourner ce problème, il existe deux solutions :
+
+* l'**adressage ouvert** : la nouvelle valeur est stockée à une autre endroit dans la table, la méthode pour trouver ce nouvel endroit s'appelle un sondage, il peut être linéaire $h_{i+1}(c) = h_i(c)+A, A\in\mathbb N$, quadratique $h_i(c) = (h(c)+(-1)^{i+1}.\lceil\frac i2\rceil^2)\bmod m$ ou en double hachage $h_{i+1}(c) = h(h_i(c))$
+* le **chaînage** : les valeurs dans la table sont des listes chaînées, la nouvelle valeur est ajoutée en fin de liste
+
+L'adressage ouvert ne permet pas suppression des valeurs après ajout, ou alors lors d'une recherche de valeur, il serait impossible de distinguer la suppression d'une valeur collision et l'absence de valeur. L'utilisation de liste chaînée permet la suppression dans la table.
+
+Or la recherche dans une liste est moins efficace que dans une table de hachage. Si la table contient trop de collisions, les listes chaînées de chaque case de la table s'allongent et la recherche prend plus de temps. Tant que la répartition est uniforme et que la moyenne du nombre de collisions est relativement basse, ce n'est pas un problème. Le facteur de charge $\frac nm$ est un indicateur de la probabilité de collision d'une nouvelle entrée, si ce facteur est proche ou supérieur à 1, les nouvelles collisions sont systématiques ou presque, alors il faut agrandir la table.
+
+| $k=32\ bits$ et $n=10^6$                              | $\frac nm = 0.1$ | $\frac nm = 0.25$ | $\frac nm = 0.5$ | $\frac nm = 0.80$ | $\frac nm = 1$ |
+| ----------------------------------------------------- | :--------------: | :---------------: | :--------------: | :---------------: | :------------: |
+| $\log_2(m)$ longueur en bit de la fonction de hachage |        13        |        12         |        11        |        10         |       10       |
+| $m.k$ taille du filtre de Bloom                       |      38 Mo       |       15 Mo       |       8 Mo       |       5 Mo        |      4 Mo      |
+
+#### Ajout et recherche de message
+
+Chaque client peut avoir plusieurs messages en attente, la liste chaînée d'une case de la table contiendra elle-même les listes de messages en attente pour chaque clé à laquelle est associée la case. Une liste de message fonctionnera comme une pile, elle pourra augmenter lorsque de nouveaux messages en attente arrivent, ou bien être totalement vidée lorsque le client récupère ses messages.
+
+Comme l'utilisation d'espace mémoire est restreinte, les messages seront en réalité stockés librement, avec leur liste de destinataires, en dehors de la table de hachage. Les valeurs dans les listes de messages indexées dans les chaînées de la table de hachage seront des pointeurs vers l'adresse des messages correspondants. Un pointeur sera dupliqué pour chaque destinataire du message. Les valeurs étant des pointeurs, la taille des cases variera entre 32 et 64 bits.
+
+Les valeurs de la table de hachage seront donc des doubles listes chaînées afin d'éviter les collisions dans la table de hachage et de mémoriser des piles de messages en attente. Voici un exemple d'implémentation en C :
+
+```c
+typedef struct {
+	char* message_address;
+	char* next;
+} message_stack;
+
+typedef struct {
+	message_stack stack;
+	char* register_key;
+	char* next;
+} table_cell;
+```
+
+Lorsque la table de hachage doit être agrandie, comme pour le filtre de Bloom, les deux tables sont conservées pendant la durée de la transition. À noter cette fois-ci que passé la péremption des messages, l'ancienne table pourrait être supprimée car tous les messages vers lesquels elle pointerait auront été supprimés, auquel cas le serveur ne pourra pas dire aux clients si un utilisateur doit effectuer une vérification manuelle. Enfin, il est possible d'utiliser des fonctions de hachage qui permettent de doubler la taille de la table en conservant l'association des clés et des valeurs déjà enregistrées.
+
+Lorsque le serveur reçoit un message à délivrer, il l'enregistre dans la liste de tous les messages en attente, puis il ajoute l'adresse du message dans la table de hachage pour chaque destinataire.
+
+```
+Fonction ajout_message(message)
+	Pour dest parmi message.destinataires
+		Si test_filtre(dest) alors
+			ajout_hashtable(dest, &message)
+		Fin Si
+	Fin Pour
+Fin Fonction
+```
+
+Lorsque le serveur reçoit une requête d'envoi de messages en attente, il récupère la liste des messages en attente dans la table de hache et les transmet au client. La liste des messages récupérée peut être vide, auquel cas le client n'a pas de message en attente. Si elle n'est pas vide, pour chaque message dans la liste, le client est retiré de la liste des destinataires. Si la liste de destinataires est vide après cela, le message est supprimé. Si l'un message a été supprimé avant récupération par le client à cause de la date de péremption, le serveur précise au client que l'utilisateur doit réaliser une synchronisation manuelle à partir d'un appareil à jour.  
+
+```
+Fonction recherche_messages(cle)
+	messages = recherche_hashtable(cle)
+	Si messages n'est pas vide
+		Pour message dans message
+			Si message est accessible
+                retirer(message.destinataires, cle)
+                Si message.destinataires est vide
+                	supprimer(message)
+				Fin Si
+			Fin Si
+		Fin Pour
+	Fin Si
+	Retourner messages
+Fin Fonction
+```
+
+À intervalle régulier, le serveur va vérifier la date de péremption de chaque message. Pour cela, le serveur conserve également une liste des pointeurs vers les messages en attente. Lors de ce passage, si un pointeur pointe vers un message supprimé, c'est que celui-ci a déjà été délivré à chacun de ses destinataires, le pointeur dans la liste des messages en attente peut être supprimé. À l'inverse, si un message est arrivé à péremption, il est supprimé et le pointeur associé dans la liste de messages en attente peut être supprimé également. Ce message devait encore être délivré à au moins un destinataire, lorsque celui-ci viendra chercher la liste des messages en attente pour lui, le serveur trouvera un pointeur pointant vers un message supprimé, il pourra supprimer ce pointeur et devra préciser au client qu'il lui manque un message, pour que l'utilisateur puisse procéder à une synchronisation manuellement entre ses appareils.
