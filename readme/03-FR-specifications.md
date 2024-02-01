@@ -322,9 +322,9 @@ Pour éviter qu'un tel évènement ne se produise, un client doit systématiquem
 
 #### Format des messages
 
-> git updates de fichiers de secret JSON bien définis
-> genre un champs obligatoire `value` et des champs optionnels `tags_list`, `url` et `username`
-> les dates `creation` et `last_used` stockées uniquement sur le client, pas transmises dans le coffre
+Les messages échangés entre les clients contiennent les mis-à-jour de fichiers qui décrivent les secrets stockés dans le coffre. Un fichier de secret contient la description d'un secret détenu dans le coffre, il peut être un mot de passe, un secret à conserver ou même une note personnelle. Le format des fichiers de secret n'est pas encore précisément spécifié, mais il peut s'agir pour l'exemple d'un fichier au format JSON avec un champ obligatoire `secret` qui contiendrait un mot de passe ou un code secret, ainsi que des champs optionnels comme `username`, `url` ou `tag`.
+
+En plus des éléments contextuels (nouvelle clé publique, horodatage, liste de destinataires), un message envoyé par un client contient la mise à jour de tous les fichiers de secret ajoutés ou modifiés, à la manière d'une différence avec un gestionnaire de version comme Git.
 
 ### Communication avec le serveur
 
