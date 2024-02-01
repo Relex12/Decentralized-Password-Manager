@@ -32,8 +32,6 @@ Sur chacun de ses appareils, l'utilisateur doit enregistrer le client auprès du
 
 Du point de vue du serveur, chaque demande d'enregistrement est composée d'un identifiant utilisateur, de la clé publique du client et d'un identifiant de coffre mis bout à bout, ce qui forme la clé d'enregistrement `user_id:client_public_key:vault_id`. La clé d'enregistrement sera utilisée aussi bien pour vérifier que les messages entrants proviennent d'un appareil enregistré que pour vérifier que les appareils destinataires de ce message sont également tous enregistrés.
 
-> TODO: est-ce que la clé d'enregistrement ne doit pas être hachée pour les futures utilisations ? Comme ça le serveur n'est pas capable de déterminer quel user_id a envoyé des messages quel jour à quelle heure
-
 L'identifiant de l'utilisateur `user_id` doit permettre de contacter l'utilisateur via un service tiers afin de s'assurer de son identité, il s'agit d'une adresse email ou d'un numéro de téléphone portable. L'adresse email offre l'avantage de la gratuité d'envoi des mail pour le serveur, vis-àvis du numéro de téléphone qui vérifie mieux l'identité de l'utilisateur (il est moins facile d'avoir un nouveau numéro de téléphone qu'une nouvelle adresse email) mais qui nécessite de passer par un tier payant pour envoyer des SMS. Pendant le développement, l'identifiant utilisateur sera une adresse email, à termes cela pourrait évoluer vers un numéro de téléphone. 
 
 La clé publique du client `client_public_key` est créée lors de l'installation de client ou lors de la création du coffre. La clé publique servira d'identifiant pour les appareils avec lesquels le coffre est partagé et sera utilisée pour le calcul de la clé partagée entre les clients. La clé publique d'un client peut être différente pour différents coffres.
@@ -41,6 +39,8 @@ La clé publique du client `client_public_key` est créée lors de l'installatio
 L'identifiant du coffre `vault_id` est un code aléatoire de quelques chiffres généré lors de la création du coffre à l'intérieur d'un client. Lorsque l'utilisateur souhaite ajouter un coffre sur autre autre appareil, il doit recopier son identifiant depuis un client qui possède déjà ce coffre. Le premier intérêt de cet identifiant est de fournir une sécurité supplémentaire empêchant un utilisateur malveillant qui tenterait de surcharger le serveur de messages de se faire passer pour un utilisateur déjà enregistré en connaissant son identifiant et sa clé publique s'il ne connaît pas également l'identifiant du coffre. Cet identifiant permet également aux utilisateurs de posséder plusieurs coffres dans un client qui seraient chacun partagés avec des appareils différents. 
 
 > Selon la fréquence et les moyens déployés par les attaquants pour tenter de remplir la pile de messages à envoyer avec des messages frauduleux, il est possible de changer la taille de l'identifiant du coffre de quelques chiffres à 128, 256 ou 512 bits. La recopie de l'identifiant du coffre entre les appareils ne sera alors plus faite manuellement par l'utilisateur, mais via une autre solution de communication comme le Bluetooth, le QR Code ou le protocole ICE directement intégrés à l'application.
+
+Afin de préserver l'anonymat lors des futures requêtes, le serveur n'enregistrera que la clé d'enregistrement mais son hachage cryptographique. De cette manière, lorsqu'un client communiquera plus tard avec le serveur, il pourra lui fournir uniquement le hachage de sa clé d'enregistrement, et le serveur pourra confirmer que ce client est bien enregistré sans connaître son identité.
 
 #### Séquence d'enregistrement 
 
@@ -338,6 +338,8 @@ Sécurités pour attaques en bourrage de pile
 ### Stockage des messages
 
 Afin de retrouver rapidement les messages en attente pour un client donné, le serveur utilisera une table de hachage. Cette structure de données permet de stocker des données reliées à des clés en entrée. Dans notre cas, les clés seront les clés d'enregistrement des clients stockées dans le filtre de Bloom. D'une manière similaire au filtre, en calculant le résultat d'une fonction de hachage sur la clé, on obtient l'adresse d'une case de la table, cette case contient la valeur associée à la clé. Contrairement à une liste classique, il n'est pas nécessaire de parcourir la structure dans l'ordre pour trouver la valeur d'une clé. Si la valeur est vide, c'est que la clé ne contient pas de valeur associée.
+
+Afin de garantir l'anonymat des échanges à travers le serveur, les destinataires des messages sont donnés au serveur sous forme de hachage cryptographique de clé d'enregistrement. Au sein d'un coffre, chaque appareil connait la clé d'enregistrement de tous les autres et peut calculer les hachages. Le serveur peut vérifier que le hachage correspond à une clé d'enregistrement connue grâce au filtre de Bloom sans connaître l'identité de l'utilisateur.
 
 #### Fonctionnement de la table de hachage
 
