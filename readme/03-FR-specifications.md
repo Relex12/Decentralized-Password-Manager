@@ -125,7 +125,7 @@ Les utilisateurs qui tenteront de communiquer avec le serveur après une périod
 
 > Si le protocole de chiffrement avec le serveur utilise un Double Ratchet, le client doit à ce moment réinitialiser ses compteurs afin de pouvoir communiquer avec le serveur.
 
-### Découvert des clients
+### Découverte des clients
 
 Comme le serveur n'enregistre aucune donnée sur les clients, il n'est pas possible pour un client de "découvrir" les autres appareils avec lesquels partager un coffre en passant le serveur sans avoir au préalable échangé les clés. Le terme découverte est pris dans le sens de la connaissance des clés publiques des autres clients, ainsi que de quelques caractéristiques (nom affiché à l'utilisateur, etc.), il n'y a pas de notion d'adresse.
 
@@ -286,32 +286,39 @@ Dans le cas où un coffre n'est partagé qu'entre deux à trois appareils, il n'
 
 #### Ajout d'un nouveau client
 
-Lorsque l'utilisateur souhaite ajouter un nouvel appareil à son coffre, après l'avoir enregistré auprès du serveur, il doit annoncer l'appareil entrant à tous les appareils qui partagent déjà le coffre. L'appareil entrant doit envoyer son identité à chacun des autres appareils, et l'un des appareils déjà présents doit envoyer les identités de tous les appareils déjà présents à l'appareil entrant. Si l'appareil entrant a un difficulté à contacter l'un des autres appareils, son identité peut être retransmise par un appareil qui la possède déjà.
+Lorsque l'utilisateur souhaite ajouter un nouvel appareil à son coffre, après l'avoir enregistré auprès du serveur, il doit annoncer l'appareil entrant à tous les appareils qui partagent déjà le coffre. L'étape de découverte du nouveau client se fait selon les méthodes décrites plus tôt : méthode diffusion, méthode circulaire ou méthode maître. L'appareil entrant doit envoyer son identité à chacun des autres appareils, et l'un des appareils déjà présents doit envoyer les identités de tous les appareils déjà présents à l'appareil entrant. Si l'appareil entrant a une difficulté à contacter l'un des autres appareils, son identité peut être retransmise par un appareil qui la possède déjà. Cette opération doit être faite manuellement par l'utilisateur de façon synchrone entre les appareils.
 
-Lorsqu'un nouvel appareil est ajouté au coffre, la clé partagée devient obsolète, une nouvelle clé partagée est calculée grâce aux méthodes décrites ci-dessus.
+Lorsqu'un nouvel appareil est ajouté au coffre, la clé partagée devient obsolète, une nouvelle clé partagée est calculée grâce aux méthodes décrites ci-dessus : Diffie-Hellman sur les courbes elliptiques pour deux appareils, Diffie-Hellman à base de couplage pour trois appareils.
 
 #### Double Ratchet
 
-* une seule clé = si la clé est cassée, on peut tout déchiffrer
-* un seul ratchet (un seul KDF) = forward secrecy = si une clé est cassée, on peut déchiffrer tous les messages futurs, les messages passés sont sécurisé
-* diffie-hellman ratchet = post-compromise security = sender creates a new private-public key, uses his new private key and receivers current public key to generate a new shared key, which is used as an entrypoint for KDF = si une clé est cassée, tous les messages envoyés d'affilée avec cette clé sont déchiffrables, les anciens messages et les futurs une fois que la clé aura changé (i.e. lorsque l'autre aura répondu) seront sécurisé
-* en plus du Diffie-Hellman ratchet, deux ratchet d'envoi et de réception ?= chiffrement des messages les uns après les autres avec un même Diffie-Hellman ratchet mais différentes clés ?= possibilité de déchiffrer des messages peut importe l'ordre d'arrivée pour peu qu'ils soient numérotés
+Les clients s'échangent des messages chiffrés de bout en bout grâce à la clé partagée. Si la clé partagée ne change jamais de valeur, cela signifie que si par malheur pendant toute la durée du coffre de mots de passe un attaquant parvenait à casser la clé partagée, alors il pourrait déchiffrer l'intégralité des messages passés et à venir. Le problème ne se pose pas avec des communications sur Internet par exemple, car les échanges s'étalent sur une durée très courte. Pour un gestionnaire de mots de passe, les échanges peuvent durer longtemps, potentiellement la durée de vie de l'utilisateur, alors que le nombre de mots de passe stockés fait augmenter l'intérêt de casser le coffre.
 
+Il faudrait donc changer la clé partagée régulièrement. La première solution serait d'ajouter une date de péremption sur la clé. La clé serait utilisée pour chiffrer les messages jusqu'à cette date, au delà de ça tout appareil qui vérifie auprès du serveur qu'il n'a plus de message en attente peut supprimer la clé. Mais lorsqu'un premier appareil se rend compte que la clé est périmée, il doit envoyer une demande de mise à jour de la clé publique à tous les autres appareils. Une fois que tous les appareils du coffre ont répondu, chaque appareil peut récupérer les clés publiques des autres et calculer la nouvelle clé partagée. En attendant que cela ne soit fait, aucun appareil ne peut envoyer de nouveau message. Cette mise-à-jour devrait donc être faite de façon synchrone.
 
+---
 
-> Problème : à priori, tant qu'il n'existe pas de moyen de calculer une clé partagée en un round, il n'est pas possible d'utiliser de double ratchet, et donc il est impossible de garantir la post-compromise security
-> Sinon, on peut garder la même clé et obliger à réinitialiser manuellement via les méthodes chiantes ci-dessus, auquel cas faire un paragraphe si la péremption des clés, le premier à s'en rendre compte, tout ça
-> TODO: modifier le cas à N appareils pour virer les méthodes compliquées et leurs diagrammes, peut-être les garder dans 3PBDH
+Pour changer de clé partagée automatiquement à chaque message envoyé, les clients utiliseront une fonction de dérivation de clé (*key derivation function* ou *KDF*) qui fonctionne comme un hachage pour fournir des clés de chiffrement en sortie. L'entrée d'une fonction de dérivation de clé peut notamment être une clé symétrique, ce qui serait le cas ici : lors de l'envoi du premier message dans le coffre, la clé partagée initiale est dérivée pour obtenir la clé de chiffrement. L'appareil qui émet le message et ceux qui le reçoivent partent de la même clé partagée initiale et utilisent la même fonction de dérivation, tout le monde est alors capable de déchiffrer le message avec la même clé, sans s'être partagé d'informations supplémentaires.
 
+Cette fonction de dérivation de clé fonctionne comme un roue à cliquet ou roue à rocher (*ratchet*), c'est-à-dire qu'elle ne permet d'aller que dans un sens, il n'est pas possible de remonter pour déterminer les clés qui ont été utilisées précédemment. Ainsi, si un attaquant stockait l'intégralité des messages chiffrés d'un coffre et que par change il parvenait à casser le chiffrement de l'un d'entre eux, il ne serait pas en mesure de déchiffrer tous les messages précédents, c'est la *forward secrecy*.
 
+---
 
-TODO: re regarder computerphile sur Signal : double ratchet, sésame
-relire le rapport de PX 2022
+En revanche à partir de là, en connaissant la fonction de dérivation de clé et une clé ayant servie à déchiffrer un message, l'attaquant est en mesure de déterminer la totalité des messages qui suivront. Pour palier à cette faille, les clients utilisent un *ratchet* supplémentaire de Diffie-Hellman. À chaque message envoyé, le client inscrit à l'intérieur une nouvelle clé publique pour lui-même, il peut désormais jeter son ancienne clé publique et la clé privée associée. Les clients qui reçoivent ce message peuvent le déchiffrer grâce à la clé partagée en cours, puis mettent à jour l'identité du client qui a émis le message : comme sa clé publique a changé, grâce à l'échange de clé Diffie-Hellman, une nouvelle clé partagée initiale est déterminée, qui sera utilisée comme point d'entrée pour l'autre *ratchet*. De cette manière, l'attaquant qui parviendrait à déchiffrer un message aurait connaissance de la nouvelle clé publique du client qui a émis le message, même s'il connaissait les clés publiques de tous les autres appareils, il ne pourrait pas déterminer la prochaine clé partagée, il lui faudrait la casser de nouveau. Cette propriété est la *post-compromise security*.
 
-Les clés de chiffrements peuvent être différentes : la clé partagée entre les clients et la clé dérivée du mot de passe maître
-Ainsi, l'utilisateur ne peut pas déchiffrer ses propres messages même en connaissant le mot de passe maitre, il faut à la fois de connaître de mot de passe maitre et être sur un appareil enregistré connaissant la clé partagée
+C'est pour cette raison qu'il est important d'avoir une méthode équivalente à Diffie-Hellman qui permette à plusieurs partis de calculer une clé partagée en un seul tour, afin de pouvoir la mettre à jour à chaque message envoyé. Sans cette méthode, il faudrait chiffrer les messages de façon pair-à-pair et les stocker autant de fois sur le serveur (c'est la solution optée par le protocole Signal pour les conversations de groupe) ou obliger l'utilisateur à réinitialiser régulièrement la clé partagée et renoncer à la *post-compromise security* pendant l'utilisation de chaque clé.
 
-> Soit déplacer cette section plus haut, soit préciser dans un paragraphe que lors de l'ajout d'un nouvel appareil, la clé est reset et donc les compteurs le sont aussi
+---
+
+De plus, il serait possible d'ajouter deux *ratchets* en sortie du premier, un pour l'émission de message et un pour la réception. Dans une conversation pair-à-pair, les *ratchets* doivent être synchronisés de telle façon que le *ratchet* d'émission de l'un corresponde toujours au *ratchet* de réception de l'autre et réciproquement. Lorsque l'un des pairs envoie plusieurs messages d'affilée, il ne met à jour sa clé publique que lors du premier envoi de message, et pour chacun des messages suivants, il n'incrémente que le *ratchet* d'émission. L'émetteur précise dans chaque message son numéro pour que le récepteur puisse les remettre dans l'ordre si besoin. Chaque message est chiffré avec une clé différente. De cette manière, l'autre pair peut déchiffrer chaque message indépendamment en faisant tourner son *ratchet* de réception autant de fois que le nombre indiqué dans le message. Si les messages n'arrivent pas dans l'ordre, il peut tout de même déchiffrer les premiers arrivés et conserver l'état initial de son *ratchet* de réception pour déchiffrer les autres messages quand ils arriveront. Au sein d'une suite de message, la clé publique de l'émetteur n'est pas réinitialisée, donc la *post-compromise security* n'est pas assurée, mais cela ne concerne en général que peu de messages et ne représente pas un si grand risque, la sécurité étant rétablie dès que l'autre pair envoie un nouveau message.
+
+Dans le cas d'un gestionnaire de mots de passe avec plusieurs appareils, il n'est pas possible d'avoir recours à ces deux *ratchets*, car le *ratchet* de réception pour les uns ne sera pas forcément le *ratchet* de réception pour les autres. Cela ne devrait pas trop poser problème dans la mesure où chaque client reçoit du serveur la pile des messages en attente dans l'ordre dans lequel ils ont été reçu. Lorsqu'un client reçoit plusieurs messages en attente, il déchiffre le premier grâce à sa version actuelle de la clé partagée, met à jour la clé partagée avec la nouvelle clé publique de l'émetteur du message, déchiffre le deuxième message, ainsi de suite. Si un même client envoie plusieurs messages d'affilée, il doit mettre à jour sa clé publique dans chacun d'entre eux. Les clients qui récupèrerent les messages devront les déchiffrer dans l'ordre.
+
+---
+
+Si deux appareils venaient à envoyer deux messages simultanément, c'est-à-dire qu'un premier A envoie un message et qu'un deuxième B en envoyait un aussi avant de récupérer le premier, alors il chiffrerait son message à partir d'une clé qui ne pourrait pas être reconstituée par n'importe quel client du coffre, car la clé publique de A aura changé entre le moment où B envoie son message et le moment où les autres clients reçoivent chaque message. Le premier message étant reçu en premier, pour chaque client autre que B, la clé partagée ne sera pas compatible. De son point de vue, B ne peut pas se rendre compte de la situation car il recevrait le message de A après avoir envoyé le sien. Il ne se rendra compte qu'il est exclu du coffre que lorsqu'il recevra un message qu'il ne sera pas en mesure de déchiffrer. Un appareil C envoie un message chiffré par la nouvelle clé partagée qui comprend la nouvelle clé publique de A mais pas la nouvelle clé publique de B (puisqu'au moment de recevoir le message qui la contenait, C ne pouvait pas le déchiffrer car il avait déjà mis à jour la clé partagée).
+
+Pour éviter qu'un tel évènement ne se produise, un client doit systématiquement envoyer une demande de récupération des messages en attente avant d'envoyer un nouveau message. En pratique, il peut même envoyer le nouveau message en même temps que la demande de récupération des messages en attente, d'une manière similaire au *piggybacking* dans un protocole de transport de données. Le serveur doit refuser d'ajouter un pile un message qui provient d'un client qui a encore des messages en attente d'être récupérés. Les clients peuvent également ajouter un horodatage à l'intérieur des messages qu'ils envoient, afin de vérifier qu'aucun message antérieur ne soit reçu ultérieurement. Cet horodatage est différent peut-être différent de celui utilisé par le serveur pour calculer la date de péremption d'un message, le but étant d'être précis afin de détecter les inversions de messages envoyés quasiment simultanément.
 
 #### Format des messages
 
@@ -326,6 +333,8 @@ L'envoi de message entre les clients se fait en passant par le serveur
 Gestion de la pile de messages à délivrer
 
 Sécurités pour attaques en bourrage de pile
+
+> Attention : si le serveur n'authentifie qu'avec le hash de la clé d'enregistrement dans le filtre de Bloom, il n'est pas possible de vérifier une signature. Réfléchir si c'est si grave, modifier paragraphes Enregistrement sur le serveur et Stockage des messages si besoin
 
 #### Double Ratchet ?
 
