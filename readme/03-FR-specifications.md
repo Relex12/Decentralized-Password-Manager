@@ -46,18 +46,7 @@ Afin de préserver l'anonymat lors des futures requêtes, le serveur n'enregistr
 
 L'utilisateur envoie une requête d'enregistrement au serveur depuis un client avec la clé d'enregistrement `user_id:client_public_key:vault_id`. Le serveur envoie un challenge, c'est-à-dire un code à usage unique, via email ou SMS grâce à l'identifiant utilisateur, puis répond au client que le challenge a été envoyé. L'utilisateur doit saisir le code dans le client qui va l'envoyer au serveur. Le serveur ajoute ensuite l'utilisateur au filtre de Bloom et répond une confirmation d'enregistrement au client. La communication peut se terminer.
 
-```mermaid
-sequenceDiagram
-	participant TE as Téléphone / Email
-	participant C as Client
-	participant S as Serveur
-	C ->> S: Requête d'enregistrement
-	S ->> TE: Challenge code
-	S ->> C: Réponse challenge envoyé
-	C ->> S: Requête réponse challenge
-	Note over S: enregistrement dans le filtre de Bloom
-	S ->> C: Réponse enregistrement réussi
-```
+![register-sequence](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/register-sequence.png)
 
 À l'issu de l'enregistrement, le coffre n'est pas encore partagé entre les appareils. Plus spécifiquement, les clients qui doivent se partager le coffre ne se connaissent pas encore.
 
@@ -144,99 +133,29 @@ L'opération de découverte des clients est censée être synchrone. Lorsqu'un a
 L'utilisateur doit donc relier ses appareils entre eux en plus de les enregistrer auprès du serveur. Chaque appareil doit découvrir chaque autre manuellement, il y a pour cela deux procédures :
 
 * **méthode diffusion** : chaque appareil envoie toutes les identités qu'il connait à tous les appareils qu'il ne connait pas encore, chaque appareil répond toutes les identités qu'il connait et que l'autre appareil ne connait pas
-	```mermaid
-	sequenceDiagram
-	participant A as Appareil A
-	participant B as Appareil B
-	participant C as Appareil C
-	participant D as Appareil D
-	par
-		A ->> B: envoi la clé publique de A
-	and
-		B ->> A: envoi la clé publique de B
-	end
-	Note over A: connait B
-	Note over B: connait A
-	par
-		A ->> C: envoi les clés publiques de A et B
-	and
-		C ->> A: envoi la clé publique de C
-	end
-	Note over A: connait B et C
-	Note over C: connait A et B
-	par
-		A ->> D: envoi les clés publiques de A, B et C
-	and
-		D ->> A: envoi la clé publique de D
-	end
-	Note over A: connait B, C et D
-	Note over D: connait A, B et C
-	par
-		B ->> C: envoi les clés publiques de A et B
-	and
-		C ->> B: envoi la clé publique de C
-	end
-	Note over B: connait A et C
-	par
-		B ->> D: envoi les clés publiques de A, B et C
-	and
-		D ->> B: envoi la clé publique de D
-	end
-	Note over B: connait A, C et D
-	par
-		C ->> D: envoi les clés publiques de A, B et C
-	and
-		D ->> C: envoi la clé publique de D
-	end
-	Note over C: connait A, B et D
-	```
+
+	![diffusion](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/diffusion.png)
+
 	* *point négatif* : de nombreux messages sont inutiles
 	* *point négatif* : le très grand nombre d'échanges nécessaires, $n(n-1)$ pour $n$ appareils
 	* *point négatif* : les échanges doivent être bidirectionnels
 	* *point positif* : les échanges peuvent être réalisés dans n'importe quel ordre
-  
+
 * **méthode circulaire** : le premier appareil envoie son identité au deuxième, le deuxième envoie son identité et celle du premier au troisième, etc., jusqu'au dernier qui envoie toutes les identités au premier
-	```mermaid
-	sequenceDiagram
-	participant A as Appareil A
-	participant B as Appareil B
-	participant C as Appareil C
-	participant D as Appareil D
-	A ->> B: envoi la clé publique de A
-	B ->> C: envoi les clés publiques de A et B
-	C ->> D: envoi les clés publiques de A, B et C
-	D ->> A: envoi les clés publiques de A, B, C et D
-	```
+
+	![circular](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/circular.png)
+
 	* *point négatif* : les échanges doivent être réalisés dans un ordre précis
 	* *point positif* : le faible nombre d'échanges nécessaires, $n$ pour $n$ appareils
 	* *point positif* : les échanges peuvent être unidirectionnels
-	
+
 * **méthode maître** : dans un premier temps un appareil maître reçoit l'identité de chaque autre, ensuite le maître envoie toutes les identités à chacun
-	
-	```mermaid
-	sequenceDiagram
-	participant A as Appareil A
-	participant B as Appareil B
-	participant C as Appareil C
-	participant D as Appareil D
-	par
-		B ->> A: envoi la clé publique de B
-	and
-		C ->> A: envoi la clé publique de C
-	and
-		D ->> A: envoi la clé publique de D
-	end
-	par
-		A ->> B: envoi les clés publiques de A, B, C, et D
-	and
-		A ->> C: envoi les clés publiques de A, B, C, et D
-	and
-		A ->> D: envoi les clés publiques de A, B, C, et D
-	end
-  ```
-  * *point négatif* : le nombre d'échanges nécessaires, $2(n-1)$ pour $n$ appareils
-  * *point positif* : les échanges peuvent être unidirectionnels
-  * *point positif* : les échanges peuvent être réalisés dans n'importe quel ordre
+
+	![master](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/master.png)
+
+	* *point négatif* : le nombre d'échanges nécessaires, $2(n-1)$ pour $n$ appareils
+	* *point positif* : les échanges peuvent être unidirectionnels
+	* *point positif* : les échanges peuvent être réalisés dans n'importe quel ordre
 
 À noter que faire se découvrir deux appareils, l'utilisateur doit manipuler les deux en même temps, c'est donc une opération peu ergonomique. Pour minimiser le nombre transmissions à effectuer, la deuxième méthode est plus efficace, $n$ messages pour $n$ appareils contre $n(n-i)$ et $2(n-1)$. Mais la troisième méthode est plus pratique à utiliser car les échanges n'ont pas d'ordre précis et que le fonctionnement ne dépend pas du nombre d'appareils. Pour d'autres raisons, notamment la gestion des clients d'un coffre, il serait avantageux d'avoir recours à un appareil maître pour chaque coffre. Les clients pourront également supporter les autres méthodes qui pourront être réalisées entièrement ou en partie.
 
