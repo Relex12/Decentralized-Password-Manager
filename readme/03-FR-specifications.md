@@ -190,10 +190,10 @@ L'utilisateur doit donc relier ses appareils entre eux en plus de les enregistre
 	end
 	Note over C: connait A, B et D
 	```
-  * *point négatif* : de nombreux messages sont inutiles
-  * *point négatif* : le très grand nombre d'échanges nécessaires, $n(n-1)$ pour $n$ appareils
-  * *point négatif* : les échanges doivent être bidirectionnels
-  * *point positif* : les échanges peuvent être réalisés dans n'importe quel ordre
+	* *point négatif* : de nombreux messages sont inutiles
+	* *point négatif* : le très grand nombre d'échanges nécessaires, $n(n-1)$ pour $n$ appareils
+	* *point négatif* : les échanges doivent être bidirectionnels
+	* *point positif* : les échanges peuvent être réalisés dans n'importe quel ordre
   
 * **méthode circulaire** : le premier appareil envoie son identité au deuxième, le deuxième envoie son identité et celle du premier au troisième, etc., jusqu'au dernier qui envoie toutes les identités au premier
 	```mermaid
@@ -271,189 +271,14 @@ Ce domaine fait l'objet de recherches académiques, mais il n'existe pas encore 
 
 ##### Cas à $N$ appareils
 
-En l'état actuel des recherches scientifiques, la cryptographie à base de couplage n'est pas encore assez performante pour permettre à quatre appareils ou plus d'échanger une clé. Pour cela, il faudrait être en mesure de trouver des couplages avec pour ensemble de départ $N$ courbes elliptiques, mais il n'existe a priori pas de méthode pour trouver ces couplages.
+En l'état actuel des recherches scientifiques, la cryptographie à base de couplage n'est pas encore assez performante pour permettre à quatre appareils ou plus d'échanger une clé. Pour cela, il faudrait être en mesure de trouver des couplages avec pour ensemble de départ $N$​ courbes elliptiques, mais il n'existe a priori pas de méthode pour trouver ces couplages.
 
-Dans notre cas d'usage, pour quatre appareils et plus, nous utiliserons un modèle d'échange de clé standard à base de Diffie-Hellman sur des courbes elliptiques. Plusieurs modèles de création de clé partagée avec leurs avantages et leurs inconvénients sont listés ci-dessous. Ces modèles supposent que les appareils connaissent au préalable les clés publiques de chacun, ce qui est le cas suite à la découverte des clients. Chaque message est envoyée de façon pair-à-pair, soit par le serveur, soit manuellement via Bluetooth, QR Code, ICE ou autre. Les messages passant par le serveur sont chiffrés de bout-en-bout entre les deux appareils et ont une date de péremption assez courte.
-
-1. **clé partagée aléatoire créé par un appareil maître**
-
-	```mermaid
-	sequenceDiagram
-	participant A as Appareil A
-	participant B as Appareil B
-	participant C as Appareil C
-	participant D as Appareil D
-	Note over A: génère une clé partagée aléatoire
-	par
-		A ->> B: envoi de la clé partagée
-	and
-		A ->> C: envoi de la clé partagée
-	and
-		A ->> D: envoi de la clé partagée
-	end
-	```
-
-	* *point négatif* : la clé partagée est envoyée, il suffirait de casser le chiffrement d'un message pour compromettre toute la sécurité
-	* *point négatif* : la clé partagée est envoyée plusieurs fois avec différents chiffrements, ce qui peut faciliter une attaque 
-	* *point négatif* : la clé partagée est créée depuis un seul appareil, auquel les autres doivent faire confiance et dont la génération de nombre aléatoires pourrait être défaillante
-	* *point positif* : la procédure ne prend qu'un seul tour, les messages sont envoyés en parallèle
-	* *point positif* : le faible nombre de messages, $n-1$ pour $n$ appareils
-	* *point positif* : la procédure n'a pas besoin d'être réalisée de nouveau lors de l'ajout d'un nouvel appareil
-	* *point positif* : l'ajout d'un nouvel appareil peut être fait de manière synchrone depuis un seul appareil
-
-2. **clé partagée aléatoire créé conjointement par tous les appareils**
-
-	```mermaid
-	sequenceDiagram
-		participant A as Appareil A
-		participant B as Appareil B
-		participant C as Appareil C
-		participant D as Appareil D
-		par
-			Note over A: génère une partie aléatoire
-			par
-				A ->> B: envoi
-			and
-				A ->> C: envoi
-			and
-				A ->> D: envoi
-			end
-		and
-			Note over B: génère une partie aléatoire
-			par
-				B ->> A: envoi
-			and
-				B ->> C: envoi
-			and
-				B ->> D: envoi
-			end
-		and
-			Note over C: génère une partie aléatoire
-			par
-				C ->> A: envoi
-			and
-				C ->> B: envoi
-			and
-				C ->> D: envoi
-			end
-		and
-			Note over D: génère une partie aléatoire
-			par
-				D ->> A: envoi
-			and
-				D ->> B: envoi
-			and
-				D ->> C: envoi
-			end
-		end
-		par
-			Note over A: concaténation hachage et dérivation
-		and
-			Note over B: concaténation hachage et dérivation
-		and
-			Note over C: concaténation hachage et dérivation
-		and
-			Note over D: concaténation hachage et dérivation
-		end
-
-	```
-
-	* *point négatif* : la clé partagée est envoyée, il suffirait de casser le chiffrement de quelques messages pour compromettre toute la sécurité
-	* *point négatif* : le très grand nombre de messages, $n(n-1)$ pour $n$ appareils
-	* *point négatif* : l'ajout d'un nouvel appareil doit être fait de manière synchrone depuis tous les appareils
-	* *point positif* : la clé partagée est créée à partir de tous les appareils
-	* *point positif* : la procédure ne prend qu'un seul tour, les messages sont envoyés en parallèle
-	* *point positif* : la procédure n'a pas besoin d'être réalisée de nouveau lors de l'ajout d'un nouvel appareil
-
-3. **signature successive de la clé partagée coordonné par un appareil maître**
-
-	```mermaid
-	sequenceDiagram
-	participant A as Appareil A
-	participant B as Appareil B
-	participant C as Appareil C
-	participant D as Appareil D
-	Note over A: calcul de la clé partagée entre A et D
-	A ->> B: demande de signature
-	Note over B: calcul de la clé partagée entre A, B et D
-	B ->> A: envoi de la clé partagée entre A, B et D
-	A ->> C: demande de signature
-	Note over C: calcul de la clé partagée entre A, B, C et D
-	C ->> A: envoi de la clé partagée entre A, B, C et D
-	par
-		A ->> B: envoi de la clé partagée
-	and
-		A ->> C: envoi de la clé partagée
-	and
-		A ->> D: envoi de la clé partagée
-	end
-	```
-
-	* *point négatif* : la clé partagée est envoyée, il suffirait de casser le chiffrement d'un message pour compromettre toute la sécurité
-	* *point négatif* : le grand nombre de messages, $3n-5$ pour $n$ appareils
-	* *point négatif* : certains appareils connaissent des clés partagées desquelles ils ne font pas partie, exemple B connait la clé entre A et D
-	* *point négatif* : l'ajout d'un nouvel appareil doit être fait de manière synchrone depuis tous les appareils
-	* *point positif* : la clé partagée est créée à partir de tous les appareils
-
-4. **échanges de clés Diffie-Hellman circulaires**
-
-	```mermaid
-	sequenceDiagram
-		participant A as Appareil A
-		participant B as Appareil B
-		participant C as Appareil C
-		participant D as Appareil D
-		par
-			Note over A: calcul de la clé partagée entre A et D
-			A ->> B: envoi de la clé entre A et D
-		and
-			Note over B: calcul de la clé partagée entre A et B
-			B ->> C: envoi de la clé entre A et B
-		and
-			Note over C: calcul de la clé partagée entre B et C
-			C ->> D: envoi de la clé entre B et C
-		and
-			Note over D: calcul de la clé partagée entre C et D
-			D ->> A: envoi de la clé entre C et D
-		end
-	
-		par
-			Note over A: calcul de la clé partagée entre A, C et D
-			A ->> B: envoi de la clé entre A, C et D
-		and
-			Note over B: calcul de la clé partagée entre A, B et D
-			B ->> C: envoi de la clé entre A, B et D
-		and
-			Note over C: calcul de la clé partagée entre A, B et C
-			C ->> D: envoi de la clé entre A, B et C
-		and
-			Note over D: calcul de la clé partagée entre B, C et D
-			D ->> A: envoi de la clé entre B, C et D
-		end
-	
-		par
-			Note over A: calcul de la clé partagée
-		and
-			Note over B: calcul de la clé partagée
-		and
-			Note over C: calcul de la clé partagée
-		and
-			Note over D: calcul de la clé partagée
-		end
-	```
-
-	* *point négatif* : de nombreux appareils connaissent des clés partagées desquelles ils ne font pas partie, exemple B connait la clé entre A et D
-	* *point négatif* : le très grand nombre de messages, $n(n-2)$ pour $n$ appareils
-	* *point négatif* : l'ajout d'un nouvel appareil doit être fait de manière synchrone depuis tous les appareils
-	* *point positif* : la clé partagée est créée à partir de tous les appareils
-	* *point positif* : la clé partagée finale n'est pas envoyée
-
-##### Synthèse création de clé et nombre maximal d'utilisateurs
+Il n'est pas sécurisé d'utiliser des méthodes d'échange de clé en plusieurs tours, comme décrit dans l'[étude sur les échanges de clés multipartites Diffie-Hellman](https://relex12.github.io/fr/3PBDH), car on souhaite conserver un calcul de la clé partagée en un seul tour, en connaissant la clé privée d'un appareil et les clés publiques des autres, afin de pouvoir implémenter le Double Ratchet du protocole Signal. En plus, l'obligation de créer une clé partagée manuellement de façon synchrone crée un manque d'ergonomie.
 
 Dans le cas où un coffre n'est partagé qu'entre deux à trois appareils, il n'y a pas de difficulté concernant la création d'une clé partagée. Pour quatre appareils ou plus, plusieurs options sont à envisager :
 
 * le nombre maximal d'appareils peut être limité à trois : l'utilisateur sera invité à créer différents coffres pour différents usages afin qu'aucun ne dépasse trois appareils
-* l'une des méthodes ci-dessus peut être implémentée : l'utilisateur devra réaliser un nombre important d'échanges entre tous ses appareils, il sera éventuellement mis en garde d'un risque de sécurité (quitte à n'autoriser dans le client que les méthodes qui minimisent le risque d'attaque comme le Bluetooth et le QR Code)
+* l'une des méthodes à plusieurs tours peut être implémentée : l'utilisateur devra réaliser un nombre important d'échanges entre tous ses appareils et il sera mis en garde d'un risque de sécurité (la *post compromise security* n'est pas assurée, si un échange venait à être décrypté par un attaquant, tous les échanges suivants seraient compromis jusqu'à la création manuelle d'une nouvelle clé partagée)
 * le service de nombreux appareils peut être payant : l'utilisateur pourra ajouter autant d'appareils qu'il souhaite, les messages seront chiffrés deux à deux ou trois à trois et stockés plusieurs fois dans le serveur mais ce service sera facturé en raison de l'utilisation des ressources du serveur
 * si la cryptographie à base de couplage permet une généralisation à $N$ appareils : un ensemble de couplages pourra être prédéfini pour $N$ allant de 3 à une valeur maximale, qui serait le nombre maximal d'appareils pour un coffre
 
@@ -469,7 +294,7 @@ Lorsqu'un nouvel appareil est ajouté au coffre, la clé partagée devient obsol
 
 * une seule clé = si la clé est cassée, on peut tout déchiffrer
 * un seul ratchet (un seul KDF) = forward secrecy = si une clé est cassée, on peut déchiffrer tous les messages futurs, les messages passés sont sécurisé
-* deux ratchet = post-compromise security = sender creates a new private-public key, uses his new private key and receivers current public key to generate a new shared key, which is used as an entrypoint for KDF = si une clé est cassée, tous les messages envoyés d'affilée avec cette clé sont déchiffrables, les anciens messages et les futurs une fois que la clé aura changé (i.e. lorsque l'autre aura répondu) seront sécurisé
+* diffie-hellman ratchet = post-compromise security = sender creates a new private-public key, uses his new private key and receivers current public key to generate a new shared key, which is used as an entrypoint for KDF = si une clé est cassée, tous les messages envoyés d'affilée avec cette clé sont déchiffrables, les anciens messages et les futurs une fois que la clé aura changé (i.e. lorsque l'autre aura répondu) seront sécurisé
 * en plus du Diffie-Hellman ratchet, deux ratchet d'envoi et de réception ?= chiffrement des messages les uns après les autres avec un même Diffie-Hellman ratchet mais différentes clés ?= possibilité de déchiffrer des messages peut importe l'ordre d'arrivée pour peu qu'ils soient numérotés
 
 
