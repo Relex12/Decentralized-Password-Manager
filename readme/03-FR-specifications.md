@@ -263,13 +263,13 @@ Sécurités pour attaques en bourrage de pile
 
 > Date de péremption TODO reformuler
 
-### Stockage des messages
+#### Stockage des messages
 
 Afin de retrouver rapidement les messages en attente pour un client donné, le serveur utilisera une table de hachage. Cette structure de données permet de stocker des données reliées à des clés en entrée. Dans notre cas, les clés seront les clés d'enregistrement des clients stockées dans le filtre de Bloom. D'une manière similaire au filtre, en calculant le résultat d'une fonction de hachage sur la clé, on obtient l'adresse d'une case de la table, cette case contient la valeur associée à la clé. Contrairement à une liste classique, il n'est pas nécessaire de parcourir la structure dans l'ordre pour trouver la valeur d'une clé. Si la valeur est vide, c'est que la clé ne contient pas de valeur associée.
 
 Afin de garantir l'anonymat des échanges à travers le serveur, les destinataires des messages sont donnés au serveur sous forme de hachage cryptographique de clé d'enregistrement. Au sein d'un coffre, chaque appareil connait la clé d'enregistrement de tous les autres et peut calculer les hachages. Le serveur peut vérifier que le hachage correspond à une clé d'enregistrement connue grâce au filtre de Bloom sans connaître l'identité de l'utilisateur.
 
-#### Fonctionnement de la table de hachage
+##### Fonctionnement de la table de hachage
 
 Soit $T$ une table de taille $m$, et $h$ une fonction de hachage cryptographique de taille $\log_2(m)$ de sorte que pour toute clé $e$, la sortie de $h$ sur $e$ est comprise entre 1 et $m$. Les cases de la table sont de taille identique $k$. La taille de la table est $m.k$.
 
@@ -289,7 +289,7 @@ Or la recherche dans une liste est moins efficace que dans une table de hachage.
 | $\log_2(m)$ longueur en bit de la fonction de hachage |        13        |        12         |        11        |        10         |       10       |
 | $m.k$ taille du filtre de Bloom                       |      38 Mo       |       15 Mo       |       8 Mo       |       5 Mo        |      4 Mo      |
 
-#### Ajout et recherche de message
+##### Ajout et recherche de message
 
 Chaque client peut avoir plusieurs messages en attente, la liste chaînée d'une case de la table contiendra elle-même les listes de messages en attente pour chaque clé à laquelle est associée la case. Une liste de message fonctionnera comme une pile, elle pourra augmenter lorsque de nouveaux messages en attente arrivent, ou bien être totalement vidée lorsque le client récupère ses messages.
 
