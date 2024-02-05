@@ -209,6 +209,12 @@ Lorsque l'utilisateur souhaite ajouter un nouvel appareil à son coffre, après 
 
 Lorsqu'un nouvel appareil est ajouté au coffre, la clé partagée devient obsolète, une nouvelle clé partagée est calculée grâce aux méthodes décrites ci-dessus : Diffie-Hellman sur les courbes elliptiques pour deux appareils, Diffie-Hellman à base de couplage pour trois appareils.
 
+#### Format des messages
+
+Les messages échangés entre les clients contiennent les mis-à-jour de fichiers qui décrivent les secrets stockés dans le coffre. Un fichier de secret contient la description d'un secret détenu dans le coffre, il peut être un mot de passe, un secret à conserver ou même une note personnelle. Le format des fichiers de secret n'est pas encore précisément spécifié, mais il peut s'agir pour l'exemple d'un fichier au format JSON avec un champ obligatoire `secret` qui contiendrait un mot de passe ou un code secret, ainsi que des champs optionnels comme `username`, `url` ou `tag`.
+
+En plus des éléments contextuels (nouvelle clé publique, horodatage, liste de destinataires), un message envoyé par un client contient la mise à jour de tous les fichiers de secret ajoutés ou modifiés, à la manière d'une différence avec un gestionnaire de version comme Git.
+
 #### Double Ratchet
 
 Les clients s'échangent des messages chiffrés de bout en bout grâce à la clé partagée. Si la clé partagée ne change jamais de valeur, cela signifie que si par malheur pendant toute la durée du coffre de mots de passe un attaquant parvenait à casser la clé partagée, alors il pourrait déchiffrer l'intégralité des messages passés et à venir. Le problème ne se pose pas avec des communications sur Internet par exemple, car les échanges s'étalent sur une durée très courte. Pour un gestionnaire de mots de passe, les échanges peuvent durer longtemps, potentiellement la durée de vie de l'utilisateur, alors que le nombre de mots de passe stockés fait augmenter l'intérêt de casser le coffre.
@@ -239,29 +245,9 @@ Si deux appareils venaient à envoyer deux messages simultanément, c'est-à-dir
 
 Pour éviter qu'un tel évènement ne se produise, un client doit systématiquement envoyer une demande de récupération des messages en attente avant d'envoyer un nouveau message. En pratique, il peut même envoyer le nouveau message en même temps que la demande de récupération des messages en attente, d'une manière similaire au *piggybacking* dans un protocole de transport de données. Le serveur doit refuser d'ajouter un pile un message qui provient d'un client qui a encore des messages en attente d'être récupérés. Les clients peuvent également ajouter un horodatage à l'intérieur des messages qu'ils envoient, afin de vérifier qu'aucun message antérieur ne soit reçu ultérieurement. Cet horodatage est différent peut-être différent de celui utilisé par le serveur pour calculer la date de péremption d'un message, le but étant d'être précis afin de détecter les inversions de messages envoyés quasiment simultanément.
 
-#### Format des messages
-
-Les messages échangés entre les clients contiennent les mis-à-jour de fichiers qui décrivent les secrets stockés dans le coffre. Un fichier de secret contient la description d'un secret détenu dans le coffre, il peut être un mot de passe, un secret à conserver ou même une note personnelle. Le format des fichiers de secret n'est pas encore précisément spécifié, mais il peut s'agir pour l'exemple d'un fichier au format JSON avec un champ obligatoire `secret` qui contiendrait un mot de passe ou un code secret, ainsi que des champs optionnels comme `username`, `url` ou `tag`.
-
-En plus des éléments contextuels (nouvelle clé publique, horodatage, liste de destinataires), un message envoyé par un client contient la mise à jour de tous les fichiers de secret ajoutés ou modifiés, à la manière d'une différence avec un gestionnaire de version comme Git.
-
 ### Communication avec le serveur
 
-L'envoi de message entre les clients se fait en passant par le serveur
-
-Gestion de la pile de messages à délivrer
-
-Sécurités pour attaques en bourrage de pile
-
-> Attention : si le serveur n'authentifie qu'avec le hash de la clé d'enregistrement dans le filtre de Bloom, il n'est pas possible de vérifier une signature. Réfléchir si c'est si grave, modifier paragraphes Enregistrement sur le serveur et Stockage des messages si besoin
-
-#### Double Ratchet ?
-
-> Attention : lorsqu'un client envoi un message au serveur, s'il est déjà enregistré, il doit chiffrer / signer ses messages avec la clé publique du serveur pour que celui-ci vérifie que la clé publique utilisée pour ce message est identique à celle annoncée lors de l'enregistrement dans le filtre de Bloom
-> En pratique, on metttra en place un Double Ratchet à partir de la clé publique annoncée lors de l'enregistrement dans la table et la clé publique du serveur
-> Attention : le serveur doit alors conserver l'état des compteurs du Double Ratchet pour chaque appareil enregistré, noté avec sa clé d'enregistrement `user_id:client_public_key:vault_id`
-
-> Date de péremption TODO reformuler
+Pour s'échanger des messages, les clients doivent communiquer avec le serveur de manière sécurisée. Les messages sont d'abord transmis au serveur pour y être stockés, jusqu'à ce qu'ils aient été délivrés à tous leurs destinataires.
 
 #### Stockage des messages
 
@@ -344,3 +330,15 @@ Fin Fonction
 ```
 
 À intervalle régulier, le serveur va vérifier la date de péremption de chaque message. Pour cela, le serveur conserve également une liste des pointeurs vers les messages en attente. Lors de ce passage, si un pointeur pointe vers un message supprimé, c'est que celui-ci a déjà été délivré à chacun de ses destinataires, le pointeur dans la liste des messages en attente peut être supprimé. À l'inverse, si un message est arrivé à péremption, il est supprimé et le pointeur associé dans la liste de messages en attente peut être supprimé également. Ce message devait encore être délivré à au moins un destinataire, lorsque celui-ci viendra chercher la liste des messages en attente pour lui, le serveur trouvera un pointeur pointant vers un message supprimé, il pourra supprimer ce pointeur et devra préciser au client qu'il lui manque un message, pour que l'utilisateur puisse procéder à une synchronisation manuellement entre ses appareils.
+
+#### Serveur push
+
+#### Sécurité sur la pile
+
+> Sécurités pour attaques en bourrage de pile
+
+#### Chiffrement client-serveur
+
+En plus du chiffrement de bout en bout des messages entre les clients, toutes les communications entre un client et le serveur sont également chiffrées. De cette manière, si deux clients appartiennent au même coffre, l'un ne peut pas épier les conversations de l'autre avec le serveur. Plus exactement, le contenu des informations échangées entre le client et le serveur, comme la liste des autres clients dans un coffre, est chiffré.
+
+> Attention : si le serveur n'authentifie qu'avec le hash de la clé d'enregistrement dans le filtre de Bloom, il n'est pas possible de vérifier une signature. Réfléchir si c'est si grave, modifier paragraphes Enregistrement sur le serveur et Stockage des messages si besoin
