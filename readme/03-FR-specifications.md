@@ -8,7 +8,32 @@ Spécifications de la solution retenue et des implications pratiques
 
 ## Sommaire
 
-[toc]
+* [Spécifications techniques](#spécifications-techniques)
+    * [Sommaire](#sommaire)
+    * [Terminologie](#terminologie)
+    * [Initialisation du coffre](#initialisation-du-coffre)
+        * [Enregistrement sur le serveur](#enregistrement-sur-le-serveur)
+            * [Séquence d'enregistrement](#séquence-d'enregistrement)
+            * [Fonctionnement du filtre de Bloom](#fonctionnement-du-filtre-de-bloom)
+            * [Redimensionnement du filtre de Bloom](#redimensionnement-du-filtre-de-bloom)
+        * [Découverte des clients](#découverte-des-clients)
+    * [Communications](#communications)
+        * [Communication entre clients](#communication-entre-clients)
+            * [Création d'une clé partagée](#création-d'une-clé-partagée)
+                * [Cas à deux appareils](#cas-à-deux-appareils)
+                * [Cas à trois appareils](#cas-à-trois-appareils)
+                * [Cas à $N$ appareils](#cas-à-n-appareils)
+            * [Ajout d'un nouveau client](#ajout-d'un-nouveau-client)
+            * [Format des messages](#format-des-messages)
+            * [Double Ratchet](#double-ratchet)
+        * [Communication avec le serveur](#communication-avec-le-serveur)
+            * [Stockage des messages](#stockage-des-messages)
+                * [Fonctionnement de la table de hachage](#fonctionnement-de-la-table-de-hachage)
+                * [Ajout et recherche de message](#ajout-et-recherche-de-message)
+            * [Sécurité sur la liste de messages en attente](#sécurité-sur-la-liste-de-messages-en-attente)
+            * [Chiffrement client-serveur](#chiffrement-client-serveur)
+
+<!-- table of contents created by Adrian Bonnet, see https://Relex12.github.io/Markdown-Table-of-Contents for more -->
 
 ## Terminologie
 
