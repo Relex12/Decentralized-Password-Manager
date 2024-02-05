@@ -102,7 +102,7 @@ Afin d'éviter les demandes abusives de stockage de message sur le serveur, les 
 
 L'approche probabiliste du filtre de Bloom implique que lorsque le test d'appartenance renvoie que l'élément est présent dans la structure, ce résultat n'est pas certain, il existe une faible probabilité que l'élément ne soit pas présent. En revanche, lorsque le test renvoie que l'élément est absent, ce résultat est absolument certain.
 
-Pour obtenir une telle propriété, le filtre de Bloom ne liste pas les éléments qui sont entrés dans la structure. Le filtre se constitue d'un tableau T de booléen (ou bit) de taille $M$ dont chaque case est initialisée à 0, ainsi que de $k$ fonctions de hachage, notées $h_1$ à $h_k$, telle que chacune de ces fonctions renvoie vers des cases aléatoires dans le tableau, mais différentes entre elles. 
+Pour obtenir une telle propriété, le filtre de Bloom ne liste pas les éléments qui sont entrés dans la structure. Le filtre se constitue d'un tableau T de booléen (ou bit) de taille $M$ dont chaque case est initialisée à 0, ainsi que de $k$ fonctions de hachage, notées $h_1$ à $h_k$, telle que chacune de ces fonctions renvoie vers des cases aléatoires dans le tableau, mais différentes entre elles.
 
 Lors de l'ajout d'un élément e dans le tableau, on calcule les valeurs des fonctions de hachage $v_1=h_1(e)$ jusqu'à $v_k=h_k(e)$ et pour chacune de ses valeurs, on met un 1 dans la case du tableau correspondante $T[v_1]=1$ jusqu'à $T[v_k]=1$. Lors du test de présence d'un élément e dans le tableau, on vérifie les cases d'indice $v_1=h_1(e)$ jusqu'à $v_k=h_k(e)$, si toutes ces cases sont à 1, alors l'élément est surement présent, si au moins une case est à 0, alors il est certain que l'élément n'est pas présent.
 
