@@ -49,7 +49,7 @@ sequenceDiagram
     CA ->> C: Cert_ca
     Note over C: Vérifie la signature de Cert_s
     Note over C: Enregistre PKs
-    C ->> S: cipher(EKsc,RK+HRK)
+    C ->> S: PKc+cipher(EKsc,RK+HRK)
     S ->> TE: Challenge code
     C ->> S: Réponse challenge
     Note over S: Enregistre HRK dans le filtre de Bloom
@@ -83,11 +83,11 @@ sequenceDiagram
     Note over S: Vérifie HRKa HRKb et HRKc enregistrés
     Note over S: Ajoute message en file d'attente pour HRKb et HRKc
     par
-    B ->> S: Demande récupération messages + EPKb
+    B ->> S: EPKb + cipher(EKsb, HRKb)
     S ->> B: cipher(EKsb, HRKa+message)
     Note over B: Déchiffre message avec IKabc
     and
-    C ->> S: Demande récupération messages + EPKc
+    C ->> S: EPKc + cipher(EKsc, HRKc)
     S ->> C: cipher(EKsc, HRKa+message)
     Note over C: Déchiffre message avec IKabc
     end
@@ -141,4 +141,66 @@ sequenceDiagram
     Note over B: Calcule S3Kabc avec E2PKa
     Note over C: Calcule S3Kabc avec E2PKa
 ```
+
+## Format des trames entre clients
+
+> TODO: liste exhaustive des types de messages
+
+### Découverte des clients
+
+* type de message (4 bits)
+* clé publique (256 bits)
+* bloc chiffré
+  * nombre de clients dans le coffre (8 bits)
+    * taille du nom de l'appareil (8 bits)
+    * nom de l'appareil pour l'utilisateur (jusqu'à 255 octets)
+    * clé publique du client (256 bits)
+    * hachage de la clé d'enregistrement du client(256 bits)
+
+### Mise à jour du coffre
+
+* type de message (4 bits)
+* bloc chiffré
+  * hachage de la clé d'enregistrement de l'émetteur du message (256 bits)
+  * nouvelle clé publique de l'émetteur (256 bits)
+  * taille de la mise à jour (16 bits)
+  * mise à jour (jusqu'à 65535 octets)
+
+> La taille d'une mise à jour en situation réelle doit encore être déterminée.
+
+## Format des requêtes entre client et serveur
+
+> TODO: liste exhaustive des types de requêtes
+>
+> TODO: ajouter le protocole ICE
+
+### Demande de certificat
+
+* type de requête (8 bits)
+
+### Demande d'enregistrement
+
+* type de requête (8 bits)
+* clé publique (256 bits)
+* bloc chiffré
+  * taille de l'identifiant utilisateur (8 bits)
+  * identifiant utilisateur (jusqu'à 255 octets)
+  * hachage de la clé d'enregistrement (256 bits)
+
+> TODO: est-ce que le serveur doit connaître l'identifiant du coffre ?
+
+### Envoi de la réponse au challenge
+
+* type de requête (8 bits)
+* clé publique éphémère (256 bits)
+* bloc chiffré
+  * hachage de la clé d'enregistrement (256 bits)
+  * réponse (8 octets)
+
+### Demande de récupération de message
+
+* type de requête (8 bits)
+* clé publique éphémère (256 bits)
+* bloc chiffré
+  * hachage de la clé d'enregistrement (256 bits)
 
