@@ -22,10 +22,11 @@ Détails sur la sécurité et l'implémentation algorithmique de la cryptographi
 * une fonction de dérivation de clé (PBKDF2) : $kdf(SK)$
 * un format de certificat (X.509)
 
-## Séquence d'enregistrement
+## Diagrammes de séquence
 
 > TODO: faire des diagrammes, quitte à les inclure dans le readme 03 et supprimer celui-ci s'il est de trop
 > peut-être pas en fait
+### Séquence d'enregistrement
 
 * clés publique et privée de l'autorité de certificats : $PKca$ et $SKca$
 * certificat de l'autorité de certificats : $Cert\_ca = PKca+validity$​
@@ -56,7 +57,7 @@ sequenceDiagram
     S ->> C: Info OK
 ```
 
-## Découverte des clients et chiffrement avec le serveur
+### Découverte des clients et chiffrement avec le serveur
 
 * clés publique et privée du serveur : $PKs$ et $SKs$
 * clé publique et privée d'un client A, identifiant d'enregistrement et hachage :
@@ -106,7 +107,7 @@ sequenceDiagram
     Note over C: Vérifie SNabc
 ```
 
-## Envoi de messages entre clients
+### Envoi de messages entre clients
 
 * clé publique et privée d'un client A, identifiant d'enregistrement et hachage :
     * $PKa$ et $SKa$
@@ -160,11 +161,15 @@ sequenceDiagram
     Note over C: Calcule S3Kabc avec E2PKa
 ```
 
-## Format des trames entre clients
+## Structures de données
+
+## Format des trames
+
+### Messages entre clients
 
 > TODO: liste exhaustive des types de messages
 
-### Découverte des clients
+#### Découverte des clients
 
 * type de message (4 bits)
 * clé publique (256 bits)
@@ -175,7 +180,7 @@ sequenceDiagram
     * clé publique du client (256 bits)
     * hachage de l'identifiant d'enregistrement du client(256 bits)
 
-### Mise à jour du coffre
+#### Mise à jour du coffre
 
 * type de message (4 bits)
 * bloc chiffré
@@ -186,17 +191,17 @@ sequenceDiagram
 
 > La taille d'une mise à jour en situation réelle doit encore être déterminée.
 
-## Format des requêtes entre client et serveur
+### Requêtes client vers serveur
 
 > TODO: liste exhaustive des types de requêtes
 >
 > TODO: ajouter le protocole ICE
 
-### Demande de certificat
+#### Demande de certificat
 
 * type de requête (8 bits)
 
-### Demande d'enregistrement
+#### Demande d'enregistrement
 
 * type de requête (8 bits)
 * clé publique (256 bits)
@@ -207,7 +212,7 @@ sequenceDiagram
 
 > TODO: est-ce que le serveur doit connaître l'identifiant du coffre ?
 
-### Envoi de la réponse au challenge
+#### Envoi de la réponse au challenge
 
 * type de requête (8 bits)
 * clé publique éphémère (256 bits)
@@ -215,11 +220,27 @@ sequenceDiagram
   * hachage de l'identifiant d'enregistrement (256 bits)
   * réponse (8 octets)
 
-### Demande de récupération de message
+#### Demande de récupération de message
 
 * type de requête (8 bits)
 * clé publique éphémère (256 bits)
 * bloc chiffré
   * hachage de l'identifiant d'enregistrement (256 bits)
+
+#### Demande d'ajout de message en file d'attente
+
+### Réponses serveur vers client
+
+#### Envoi de certificat
+
+#### Confirmation d'enregistrement
+
+#### Acquittement d'ajout de message
+
+#### Erreur lors de l'ajout de message
+
+#### Demande de synchronisation manuelle
+
+#### Envoi des messages en liste d'attente
 
 
