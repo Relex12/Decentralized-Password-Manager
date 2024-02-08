@@ -194,7 +194,9 @@ Les échanges entre les clients sont des messages contenants les modifications �
 
 ### Communication entre clients
 
-Pour offrir plus de sécurité, les messages ne doivent pouvoir être déchiffrés qu'en connaissance du mot de passe maître et en utilisant un client ayant accès au coffre. Le fonctionnement du chiffrement basé un mot de passe maître est bien connu : lorsque l'utilisateur entre son mot de passe maître celui-ci est haché grâce à une fonction de hachage cryptographie puis comparé au hash stocké dans le client. Si les valeurs correspondent alors le mot de passe maître est correct, il est ensuite dérivé en clé de chiffrement symétrique grâce à une fonction de dérivation de clé (*key derivation function*, *KDF*), cette clé peut enfin être utilisée pour chiffrer et déchiffrer le coffre.
+Pour offrir plus de sécurité, les messages ne doivent pouvoir être déchiffrés que depuis un appareil dans le coffre, la connaissance du mot de passe maître n'est pas suffisante. Les messages sont chiffrés et déchiffrés grâce à un secret partagé entre tous les clients du coffre et dont l'utilisateur n'a pas besoin d'avoir connaissance.
+
+Le mot de passe maître ne sert pas au chiffrement des données qui sont échangées entre les clients. Il ne sert qu'à chiffrer et déchiffrer l'espace mémoire sur chaque client. Le fonctionnement du chiffrement basé un mot de passe maître est bien connu : lorsque l'utilisateur entre son mot de passe maître celui-ci est haché grâce à une fonction de hachage cryptographie puis comparé au hash stocké dans le client. Si les valeurs correspondent alors le mot de passe maître est correct, il est ensuite dérivé en clé de chiffrement symétrique grâce à une fonction de dérivation de clé (*key derivation function*, *KDF*), cette clé peut enfin être utilisée pour chiffrer et déchiffrer le coffre. C'est en déchiffrant cette mémoire que le client peut accéder à toutes informations sécurisés, comme sa clé privée, son identifiant d'enregitrement, en plus de ses secrets.
 
 #### Création d'une clé partagée
 
