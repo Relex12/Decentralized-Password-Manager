@@ -167,11 +167,31 @@ La couche de service du gestionnaire de mot de passe repose sur la couche sessio
 
 #### Demande d'enregistrement
 
+* type de requête (8 bits)
+* clé publique (256 bits)
+* taille de l'identifiant utilisateur (8 bits)
+* identifiant utilisateur (jusqu'à 255 octets)
+* hachage de l'identifiant du coffre (256 bits)
+
 #### Envoi de la réponse au challenge
+
+* type de requête (8 bits)
+* hachage de l'identifiant d'enregistrement (256 bits)
+* réponse (8 octets)
 
 #### Demande de récupération de message
 
+* type de requête (8 bits)
+* hachage de l'identifiant d'enregistrement (256 bits)
+
 #### Demande d'ajout de message en file d'attente
+
+* type de requête (8 bits)
+* hachage de l'identifiant d'enregistrement (256 bits)
+* nombre de destinataires (8 bits)
+  * hachage de l'identifiant d'enregistrement du destinataire (256 bits)
+* taille du message (16 bits)
+* message (jusqu'à 65535 octets)
 
 ### Réponses de la couche service (serveur vers client)
 
@@ -179,37 +199,54 @@ La couche de service du gestionnaire de mot de passe repose sur la couche sessio
 
 #### Confirmation d'enregistrement
 
+* type de réponse (8 bits)
+
 #### Acquittement d'ajout de message
+
+* type de réponse (8 bits)
+
+>  Rappel : pas de distinction entre réussite et échec dans l'acquittement d'ajout de message en file d'attente, sauf si l'erreur survenue est autre
 
 #### Erreur lors de l'ajout de message
 
+* type de réponse (8 bits)
+* data
+
 #### Demande de synchronisation manuelle
+
+* type de réponse (8 bits)
 
 #### Envoi des messages en liste d'attente
 
-### Messages de la couche chiffrée de bout en bout (entre clients)
+* type de réponse (8 bits)
+* nombre de messages (8 bits)
+  * hachage de l'identifiant d'enregistrement de l'émetteur du message (256 bits)
+  * taille du message (16 bits)
+  * message (jusqu'à 65535 octets)
+
+### Messages de la couche application (entre clients)
 
 > TODO: liste exhaustive des types de messages
 
 #### Découverte des clients
 
-* type de message (4 bits)
-* clé publique (256 bits)
-* bloc chiffré
-  * nombre de clients dans le coffre (8 bits)
+* type de message (8 bits)
+* hachage de l'identifiant utilisateur ? (256 bits)
+* hachage de l'identifiant du coffre ? (256 bits)
+* nombre de clients dans le coffre (8 bits)
+    * clé publique du client (256 bits)
+    * hachage de l'identifiant d'enregistrement du client ? (256 bits)
     * taille du nom de l'appareil (8 bits)
     * nom de l'appareil pour l'utilisateur (jusqu'à 255 octets)
-    * clé publique du client (256 bits)
-    * hachage de l'identifiant d'enregistrement du client(256 bits)
+
 
 #### Mise à jour du coffre
 
-* type de message (4 bits)
-* bloc chiffré
-  * hachage de l'identifiant d'enregistrement de l'émetteur du message (256 bits)
-  * nouvelle clé publique de l'émetteur (256 bits)
-  * taille de la mise à jour (16 bits)
-  * mise à jour (jusqu'à 65535 octets)
+* type de message (8 bits)
+* hachage de l'identifiant d'enregistrement de l'émetteur du message (256 bits)
+* nouvelle clé publique de l'émetteur (256 bits)
+* taille de la mise à jour (16 bits)
+* mise à jour (jusqu'à 65535 octets)
 
 > La taille d'une mise à jour en situation réelle doit encore être déterminée.
 
