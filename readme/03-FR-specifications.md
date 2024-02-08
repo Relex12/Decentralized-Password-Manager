@@ -391,5 +391,6 @@ Une fois que le client a récupéré la clé publique du serveur grâce au certi
 
 Le client ne doit jamais utiliser sa clé publique qui fait partie de son identifiant d'enregistrement comme clé publique éphémère pour créer une clé symétrique avec le serveur. La clé publique de l'identifiant d'enregistement ne doit pas être divulguée, sous peine d'être usurpée par des attaquants. Le client dont la clé a été divulguée risquerait alors de se retrouver ajouté à la liste noire des clients.
 
+En pratique, le chiffrement entre le client et le serveur sera réalisé par le protocole TLS (*Transport Layer Security*) qui largement utilisé sur Internet via HTTPS. Ce protocole permet d'assurer authentification du client et la confidentialité et l'intégrité des données échangées.
 
 > Comme le serveur n'enregistre pas les clés publiques, la serveur n'a pas la garantie de l'authenticité du client, il ne se base pour ceci que sur le test de présence dans le filtre de Bloom du hachage de l'identifiant d'enregistrement du client.

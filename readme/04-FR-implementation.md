@@ -28,13 +28,9 @@ Détails sur la sécurité et l'implémentation algorithmique de la cryptographi
 > peut-être pas en fait
 ### Séquence d'enregistrement
 
-* clés publique et privée de l'autorité de certificats : $PKca$ et $SKca$
-* certificat de l'autorité de certificats : $Cert\_ca = PKca+validity$​
 * clés publique et privée du serveur : $PKs$ et $SKs$
-* certificat du serveur : $Cert\_s = PKca+validity+CA\ name + ecdsa(SKca,PKca+validity+CA\ name)$
 * clés publique et privée d'un client : $PKc$ et $SKc$
-* identifiant d'enregistrement : $RID=user\_id+PKc+vault\_id$
-* hachage d'identifiant d'enregistrement : $HRID=hash(hash(user\_id)+hash(PKc)+hash(vault\_id))$
+* identifiant utilisateur et identifiant du coffre : $UID$ et $VID$
 * clé éphémère symétrique : $EKsc=ecdh(PKs,SKc)=ecdh(PKc,SKs)$
 
 ```mermaid
@@ -42,36 +38,30 @@ sequenceDiagram
 	participant TE as Téléphone / Email
     participant C as Client
     participant S as Serveur
-    participant CA
-    C ->> S: Demande certificat
-    S ->> C: Cert_s
-    Note over C: Récupère PKs et CA name
-    C ->> CA: Demande certificat
-    CA ->> C: Cert_ca
-    Note over C: Vérifie la signature de Cert_s
-    Note over C: Enregistre PKs
-    C ->> S: PKc+cipher(EKsc,RID+HRID)
+    C -> S: TLS Handshake
+    C ->> S: cipher(EKsc, UID+PKc+hash(VID))
     S ->> TE: Challenge code
-    C ->> S: Réponse challenge
+    C ->> S: cipher(EKsc, Réponse challenge)
     Note over S: Enregistre HRID dans le filtre de Bloom
-    S ->> C: Info OK
+    S ->> C: cipher(EKsc, Info OK)
 ```
 
 ### Découverte des clients et chiffrement avec le serveur
 
 * clés publique et privée du serveur : $PKs$ et $SKs$
+* identifiant utilisateur et identifiant du coffre : $UID$ et $VID$
 * clé publique et privée d'un client A, identifiant d'enregistrement et hachage :
     * $PKa$ et $SKa$
-    * $RIDa=user\_id+PKa+vault\_id$
-    * $HRIDa=hash(hash(user\_id)+hash(PKa)+hash(vault\_id))$
+    * $RIDa=UID+PKa+VID$
+    * $HRIDa=hash(hash(UID)+hash(PKa)+hash(VID))$
 * clé publique et privée d'un client B, identifiant d'enregistrement et hachage :
     * $PKb$ et $SKb$
-    * $RIDb=user\_id+PKb+vault\_id$
-    * $HRIDb=hash(hash(user\_id)+hash(PKb)+hash(vault\_id))$
+    * $RIDb=UID+PKb+VID$
+    * $HRIDb=hash(hash(UID)+hash(PKb)+hash(VID))$
 * clé publique et privée d'un client C, identifiant d'enregistrement et hachage :
     * $PKc$ et $SKc$
-    * $RIDc=user\_id+PKc+vault\_id$
-    * $HRID=hash(hash(user\_id)+hash(PKc)+hash(vault\_id))$
+    * $RIDc=UID+PKc+VID$
+    * $HRID=hash(hash(UID)+hash(PKc)+hash(VID))$
 * clés éphémères publique et privée de A, B et C : $EPKa$ et $ESKa$, $EPKb$ et $ESKb$, $EPKc$ et $ESKc$
 * clés éphémères symétriques entre A, B, C respectivement et S : $EKsa=ecdh(PKs,ESKa)$, $EKsb=ecdh(PKs,ESKb)$, $EKsb=ecdh(PKs,ESKb)$
 * clé partagée symétrique initiale : $IKabc=pbdh(PKa,PKb,SKc)$
@@ -89,15 +79,18 @@ sequenceDiagram
     and
     C ->> A: RIDc
     end
-    A ->> S: EPKa+cipher(EKsa, HRIDa+HRIDb+HRIDc+message)
+    A -> S: TLS Handshake
+    A ->> S: cipher(EKsa, HRIDa+HRIDb+HRIDc+message)
     Note over S: Vérifie HRIDa HRIDb et HRIDc enregistrés
     Note over S: Ajoute message en file d'attente pour HRIDb et HRIDc
     par
-    B ->> S: EPKb + cipher(EKsb, HRIDb)
+    B -> S: TLS Handshake
+    B ->> S: cipher(EKsb, HRIDb)
     S ->> B: cipher(EKsb, HRIDa+message)
     Note over B: Déchiffre message avec IKabc
     and
-    C ->> S: EPKc + cipher(EKsc, HRIDc)
+    C -> S: TLS Handshake
+    C ->> S: cipher(EKsc, HRIDc)
     S ->> C: cipher(EKsc, HRIDa+message)
     Note over C: Déchiffre message avec IKabc
     end
@@ -109,18 +102,19 @@ sequenceDiagram
 
 ### Envoi de messages entre clients
 
+* identifiant utilisateur et identifiant du coffre : $UID$ et $VID$
 * clé publique et privée d'un client A, identifiant d'enregistrement et hachage :
     * $PKa$ et $SKa$
-    * $RIDa=user\_id+PKa+vault\_id$
-    * $HRIDa=hash(hash(user\_id)+hash(PKa)+hash(vault\_id))$
+    * $RIDa=UID+PKa+VID$
+    * $HRIDa=hash(hash(UID)+hash(PKa)+hash(VID))$
 * clé publique et privée d'un client B, identifiant d'enregistrement et hachage :
     * $PKb$ et $SKb$
-    * $RIDb=user\_id+PKb+vault\_id$
-    * $HRIDb=hash(hash(user\_id)+hash(PKb)+hash(vault\_id))$
+    * $RIDb=UID+PKb+VID$
+    * $HRIDb=hash(hash(UID)+hash(PKb)+hash(VID))$
 * clé publique et privée d'un client C, identifiant d'enregistrement et hachage :
     * $PKc$ et $SKc$
-    * $RIDc=user\_id+PKc+vault\_id$
-    * $HRID=hash(hash(user\_id)+hash(PKc)+hash(vault\_id))$
+    * $RIDc=UID+PKc+VID$
+    * $HRID=hash(hash(UID)+hash(PKc)+hash(VID))$
 * clés éphémères publique et privée de A, B et C : $E1PKa$ et $E1SKa$, $E1PKb$ et $E1SKb$, $E1PKc$ et $E1SKc$
 * clé partagée symétrique initiale : $IKabc=pbdh(PKa,PKb,SKc)$​
 * clés partagées éphémères potentielles :
@@ -165,7 +159,35 @@ sequenceDiagram
 
 ## Format des trames
 
-### Messages entre clients
+Le gestionnaire de mots de passe est composé de deux couches : l'échange de messages entre les clients et le serveur fournit une couche de service qui est utilisée par les messages entre clients pour être transportés et chiffrés de bout en bout.
+
+La couche de service du gestionnaire de mot de passe repose sur la couche session du modèle OSI, toutes les trames qui suivent sont donc encapsulées dans des messages TLS et surviennent après le handshake TLS, c'est-à-dire la récupération du certificat du serveur et la création d'un secret partagées. Tous les messages entre les clients et le serveur sont chiffrés.
+
+### Requêtes de la couche service (client vers serveur)
+
+#### Demande d'enregistrement
+
+#### Envoi de la réponse au challenge
+
+#### Demande de récupération de message
+
+#### Demande d'ajout de message en file d'attente
+
+### Réponses de la couche service (serveur vers client)
+
+#### Envoi de certificat
+
+#### Confirmation d'enregistrement
+
+#### Acquittement d'ajout de message
+
+#### Erreur lors de l'ajout de message
+
+#### Demande de synchronisation manuelle
+
+#### Envoi des messages en liste d'attente
+
+### Messages de la couche chiffrée de bout en bout (entre clients)
 
 > TODO: liste exhaustive des types de messages
 
@@ -191,56 +213,23 @@ sequenceDiagram
 
 > La taille d'une mise à jour en situation réelle doit encore être déterminée.
 
-### Requêtes client vers serveur
 
-> TODO: liste exhaustive des types de requêtes
->
-> TODO: ajouter le protocole ICE
 
-#### Demande de certificat
 
-* type de requête (8 bits)
 
-#### Demande d'enregistrement
 
-* type de requête (8 bits)
-* clé publique (256 bits)
-* bloc chiffré
-  * taille de l'identifiant utilisateur (8 bits)
-  * identifiant utilisateur (jusqu'à 255 octets)
-  * hachage de l'identifiant d'enregistrement (256 bits)
 
-> TODO: est-ce que le serveur doit connaître l'identifiant du coffre ?
 
-#### Envoi de la réponse au challenge
 
-* type de requête (8 bits)
-* clé publique éphémère (256 bits)
-* bloc chiffré
-  * hachage de l'identifiant d'enregistrement (256 bits)
-  * réponse (8 octets)
 
-#### Demande de récupération de message
 
-* type de requête (8 bits)
-* clé publique éphémère (256 bits)
-* bloc chiffré
-  * hachage de l'identifiant d'enregistrement (256 bits)
 
-#### Demande d'ajout de message en file d'attente
 
-### Réponses serveur vers client
 
-#### Envoi de certificat
 
-#### Confirmation d'enregistrement
 
-#### Acquittement d'ajout de message
 
-#### Erreur lors de l'ajout de message
 
-#### Demande de synchronisation manuelle
 
-#### Envoi des messages en liste d'attente
 
 
