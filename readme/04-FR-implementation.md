@@ -32,8 +32,8 @@ Détails sur la sécurité et l'implémentation algorithmique de la cryptographi
 * clés publique et privée du serveur : $PKs$ et $SKs$
 * certificat du serveur : $Cert\_s = PKca+validity+CA\ name + ecdsa(SKca,PKca+validity+CA\ name)$
 * clés publique et privée d'un client : $PKc$ et $SKc$
-* clé d'enregistrement : $RK=user\_id+PKc+vault\_id$
-* hachage de clé d'enregistrement : $HRK=hash(RK)$
+* identifiant d'enregistrement : $RID=user\_id+PKc+vault\_id$
+* hachage d'identifiant d'enregistrement : $HRID=hash(hash(user\_id)+hash(PKc)+hash(vault\_id))$
 * clé éphémère symétrique : $EKsc=ecdh(PKs,SKc)=ecdh(PKc,SKs)$
 
 ```mermaid
@@ -49,24 +49,33 @@ sequenceDiagram
     CA ->> C: Cert_ca
     Note over C: Vérifie la signature de Cert_s
     Note over C: Enregistre PKs
-    C ->> S: PKc+cipher(EKsc,RK+HRK)
+    C ->> S: PKc+cipher(EKsc,RID+HRID)
     S ->> TE: Challenge code
     C ->> S: Réponse challenge
-    Note over S: Enregistre HRK dans le filtre de Bloom
+    Note over S: Enregistre HRID dans le filtre de Bloom
     S ->> C: Info OK
 ```
 
 ## Découverte des clients et chiffrement avec le serveur
 
 * clés publique et privée du serveur : $PKs$ et $SKs$
-* clé publique et privée d'un client A, clé d'enregistrement et hachage : $PKa$ et $SKa$, $RKa=user\_id+PKa+vault\_id$, $HRKa=hash(RKa)$
-* clé publique et privée d'un client B, clé d'enregistrement et hachage : $PKb$ et $SKb$, $RKb=user\_id+PKb+vault\_id$, $HRKb=hash(RKb)$
-* clé publique et privée d'un client C, clé d'enregistrement et hachage : $PKc$ et $SKc$, $RKc=user\_id+PKc+vault\_id$, $HRKc=hash(RKc)$
+* clé publique et privée d'un client A, identifiant d'enregistrement et hachage :
+    * $PKa$ et $SKa$
+    * $RIDa=user\_id+PKa+vault\_id$
+    * $HRIDa=hash(hash(user\_id)+hash(PKa)+hash(vault\_id))$
+* clé publique et privée d'un client B, identifiant d'enregistrement et hachage :
+    * $PKb$ et $SKb$
+    * $RIDb=user\_id+PKb+vault\_id$
+    * $HRIDb=hash(hash(user\_id)+hash(PKb)+hash(vault\_id))$
+* clé publique et privée d'un client C, identifiant d'enregistrement et hachage :
+    * $PKc$ et $SKc$
+    * $RIDc=user\_id+PKc+vault\_id$
+    * $HRID=hash(hash(user\_id)+hash(PKc)+hash(vault\_id))$
 * clés éphémères publique et privée de A, B et C : $EPKa$ et $ESKa$, $EPKb$ et $ESKb$, $EPKc$ et $ESKc$
 * clés éphémères symétriques entre A, B, C respectivement et S : $EKsa=ecdh(PKs,ESKa)$, $EKsb=ecdh(PKs,ESKb)$, $EKsb=ecdh(PKs,ESKb)$
 * clé partagée symétrique initiale : $IKabc=pbdh(PKa,PKb,SKc)$
-* message chiffré de bout en bout : $message=cipher(IKabc, RKa+RKb+RKc)$
-* numéro de sécurité : $SNabc=hash(HRKa+HRKb+HRKc)$
+* message chiffré de bout en bout : $message=cipher(IKabc, RIDa+RIDb+RIDc)$
+* numéro de sécurité : $SNabc=hash(HRIDa+HRIDb+HRIDc)$
 
 ```mermaid
 sequenceDiagram
@@ -75,20 +84,20 @@ sequenceDiagram
     participant B as Client B
     participant C as Client C
     par
-    B ->> A: RKb
+    B ->> A: RIDb
     and
-    C ->> A: RKc
+    C ->> A: RIDc
     end
-    A ->> S: EPKa+cipher(EKsa, HRKa+HRKb+HRKc+message)
-    Note over S: Vérifie HRKa HRKb et HRKc enregistrés
-    Note over S: Ajoute message en file d'attente pour HRKb et HRKc
+    A ->> S: EPKa+cipher(EKsa, HRIDa+HRIDb+HRIDc+message)
+    Note over S: Vérifie HRIDa HRIDb et HRIDc enregistrés
+    Note over S: Ajoute message en file d'attente pour HRIDb et HRIDc
     par
-    B ->> S: EPKb + cipher(EKsb, HRKb)
-    S ->> B: cipher(EKsb, HRKa+message)
+    B ->> S: EPKb + cipher(EKsb, HRIDb)
+    S ->> B: cipher(EKsb, HRIDa+message)
     Note over B: Déchiffre message avec IKabc
     and
-    C ->> S: EPKc + cipher(EKsc, HRKc)
-    S ->> C: cipher(EKsc, HRKa+message)
+    C ->> S: EPKc + cipher(EKsc, HRIDc)
+    S ->> C: cipher(EKsc, HRIDa+message)
     Note over C: Déchiffre message avec IKabc
     end
     Note over A: Vérifie SNabc
@@ -99,9 +108,18 @@ sequenceDiagram
 
 ## Envoi de messages entre clients
 
-* clé publique et privée d'un client A, clé d'enregistrement et hachage : $PKa$ et $SKa$, $RKa=user\_id+PKa+vault\_id$, $HRKa=hash(RKa)$
-* clé publique et privée d'un client B, clé d'enregistrement et hachage : $PKb$ et $SKb$, $RKb=user\_id+PKb+vault\_id$, $HRKb=hash(RKb)$
-* clé publique et privée d'un client C, clé d'enregistrement et hachage : $PKc$ et $SKc$, $RKc=user\_id+PKc+vault\_id$, $HRKc=hash(RKc)$
+* clé publique et privée d'un client A, identifiant d'enregistrement et hachage :
+    * $PKa$ et $SKa$
+    * $RIDa=user\_id+PKa+vault\_id$
+    * $HRIDa=hash(hash(user\_id)+hash(PKa)+hash(vault\_id))$
+* clé publique et privée d'un client B, identifiant d'enregistrement et hachage :
+    * $PKb$ et $SKb$
+    * $RIDb=user\_id+PKb+vault\_id$
+    * $HRIDb=hash(hash(user\_id)+hash(PKb)+hash(vault\_id))$
+* clé publique et privée d'un client C, identifiant d'enregistrement et hachage :
+    * $PKc$ et $SKc$
+    * $RIDc=user\_id+PKc+vault\_id$
+    * $HRID=hash(hash(user\_id)+hash(PKc)+hash(vault\_id))$
 * clés éphémères publique et privée de A, B et C : $E1PKa$ et $E1SKa$, $E1PKb$ et $E1SKb$, $E1PKc$ et $E1SKc$
 * clé partagée symétrique initiale : $IKabc=pbdh(PKa,PKb,SKc)$​
 * clés partagées éphémères potentielles :
@@ -155,13 +173,13 @@ sequenceDiagram
     * taille du nom de l'appareil (8 bits)
     * nom de l'appareil pour l'utilisateur (jusqu'à 255 octets)
     * clé publique du client (256 bits)
-    * hachage de la clé d'enregistrement du client(256 bits)
+    * hachage de l'identifiant d'enregistrement du client(256 bits)
 
 ### Mise à jour du coffre
 
 * type de message (4 bits)
 * bloc chiffré
-  * hachage de la clé d'enregistrement de l'émetteur du message (256 bits)
+  * hachage de l'identifiant d'enregistrement de l'émetteur du message (256 bits)
   * nouvelle clé publique de l'émetteur (256 bits)
   * taille de la mise à jour (16 bits)
   * mise à jour (jusqu'à 65535 octets)
@@ -185,7 +203,7 @@ sequenceDiagram
 * bloc chiffré
   * taille de l'identifiant utilisateur (8 bits)
   * identifiant utilisateur (jusqu'à 255 octets)
-  * hachage de la clé d'enregistrement (256 bits)
+  * hachage de l'identifiant d'enregistrement (256 bits)
 
 > TODO: est-ce que le serveur doit connaître l'identifiant du coffre ?
 
@@ -194,7 +212,7 @@ sequenceDiagram
 * type de requête (8 bits)
 * clé publique éphémère (256 bits)
 * bloc chiffré
-  * hachage de la clé d'enregistrement (256 bits)
+  * hachage de l'identifiant d'enregistrement (256 bits)
   * réponse (8 octets)
 
 ### Demande de récupération de message
@@ -202,5 +220,6 @@ sequenceDiagram
 * type de requête (8 bits)
 * clé publique éphémère (256 bits)
 * bloc chiffré
-  * hachage de la clé d'enregistrement (256 bits)
+  * hachage de l'identifiant d'enregistrement (256 bits)
+
 
