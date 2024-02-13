@@ -201,6 +201,7 @@ La couche de service du gestionnaire de mot de passe repose sur la couche sessio
     > * info : synchronisation manuelle du client recommandée ou requise
     > * erreur : liste de messages en attente non vide lors de l'ajout d'un message
     > * erreur : service indisponible (lors d'une attaque par exemple)
+    > * erreur : limite du nombre de messages en attente pour ce coffre atteinte
 
 * Envoi des messages en liste d'attente
     * type de réponse (8 bits)
