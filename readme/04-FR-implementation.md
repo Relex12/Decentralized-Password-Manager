@@ -24,8 +24,8 @@ Détails sur la sécurité et l'implémentation algorithmique de la cryptographi
 
 ## Diagrammes de séquence
 
-> TODO: faire des diagrammes, quitte à les inclure dans le readme 03 et supprimer celui-ci s'il est de trop
-> peut-être pas en fait
+Les échanges entre les clients et le serveur du gestionnaire de mots de passe sont spécifiés pour répondre à des problématiques de sécurité précises. Voici une présentation plus détaillée des informations contenues dans les échanges récurrents dans l'utilisation du gestionnaire avec considérations cryptographiques.
+
 ### Séquence d'enregistrement
 
 * clés publique et privée du serveur : $PKs$ et $SKs$
