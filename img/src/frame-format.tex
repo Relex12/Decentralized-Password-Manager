@@ -1,0 +1,171 @@
+\documentclass{article}
+\usepackage{bytefield}
+\usepackage{caption}
+
+\pagestyle{empty}
+
+% https://www.tablesgenerator.com/
+
+\begin{document}
+
+\begin{figure}
+\centering
+\begin{bytefield}{32}
+\bitheader{0-31} \\
+\bitbox{8}{Type}
+\bitbox[tlr]{24}{} \\
+\wordbox[lr]{7}{Public key} \\
+\bitbox[blr]{8}{} 
+\bitbox[tlr]{24}{} \\
+\wordbox[lr]{7}{Vault ID hash} \\
+\bitbox[blr]{8}{} 
+\bitbox{8}{User ID length}
+\bitbox[trl]{16}{} \\
+\wordbox[blr]{2}{User ID} \\
+\end{bytefield}
+\caption*{Demande d'enregistrement}
+\end{figure}
+
+\begin{figure}
+\centering
+\begin{bytefield}{32}
+\bitheader{0-31} \\
+\bitbox{8}{Type}
+\bitbox[tlr]{24}{} \\
+\wordbox[lr]{7}{Register ID hash} \\
+\bitbox[blr]{8}{}
+\bitbox{8}{Answer}
+\bitbox[tl]{16}{} \\
+\end{bytefield}
+\caption*{Envoi de la réponse au challenge}
+\end{figure}
+
+\begin{figure}
+\centering
+\begin{bytefield}{32}
+\bitheader{0-31} \\
+\bitbox{8}{Type}
+\bitbox[tlr]{24}{} \\
+\wordbox[lr]{7}{Register ID hash} \\
+\bitbox[blr]{8}{}
+\bitbox[tl]{24}{} \\
+\end{bytefield}
+\caption*{Demande de récupération de message}
+\end{figure}
+
+\begin{figure}
+\centering
+\begin{bytefield}{32}
+\bitheader{0-31} \\
+\bitbox{8}{Type}
+\bitbox[tlr]{24}{} \\
+\wordbox[lr]{7}{Register ID hash} \\
+\bitbox[blr]{8}{}
+\bitbox{8}{\tiny Number of receivers}
+\bitbox[tlr]{16}{} \\
+\wordbox[lr]{2}{Receivers register ID hash} \\
+\skippedwords \\
+\wordbox[lr]{1}{} \\
+\bitbox[blr]{16}{}
+\bitbox{16}{Message Length} \\
+\wordbox[lr]{2}{Message} \\
+\skippedwords \\
+\wordbox[blr]{1}{} \\
+\end{bytefield}
+\caption*{Demande d'ajout de message en file d'attente}
+\end{figure}
+
+\begin{figure}
+\centering
+\begin{bytefield}{16}
+\bitheader{0-15} \\
+\bitbox{8}{Type}
+\bitbox{8}{Code}
+\end{bytefield}
+\caption*{Info ou Erreur}
+\end{figure}
+
+\begin{figure}
+\centering
+\begin{bytefield}{32}
+\bitheader{0-31} \\
+\begin{rightwordgroup}{Multiple times}
+\bitbox{8}{Type}
+\bitbox{8}{\tiny Number of messages}
+\bitbox[tlr]{16}{} \\
+\wordbox[lr]{7}{Sender register ID hash} \\
+\bitbox[blr]{16}{} 
+\bitbox{16}{Message length} \\
+\wordbox[tlr]{2}{Message} \\
+\skippedwords \\
+\wordbox[blr]{1}{}
+\end{rightwordgroup}
+\end{bytefield}
+\caption*{Envoi des messages en liste d'attente}
+\end{figure}
+
+\begin{figure}
+\centering
+\begin{bytefield}{32}
+\bitheader{0-31} \\
+\begin{rightwordgroup}{Not end-to-end\\encrypted}
+\bitbox{8}{Type}
+\bitbox[tlr]{24}{} \\
+\wordbox[lr]{7}{Public key}
+\end{rightwordgroup} \\
+\bitbox[blr]{8}{}
+\bitbox[tl]{24}{} \\
+\end{bytefield}
+\caption*{Découverte des clients requête}
+\end{figure}
+
+\begin{figure}
+\centering
+\begin{bytefield}{32}
+\bitheader{0-31} \\
+\begin{rightwordgroup}{Not end-to-end\\encrypted}
+\bitbox{8}{Type}
+\bitbox[tlr]{24}{} \\
+\wordbox[lr]{7}{Sender public key}
+\end{rightwordgroup} \\
+\bitbox[blr]{8}{} 
+\bitbox[tlr]{24}{} \\
+\wordbox[lr]{7}{User ID hash} \\
+\bitbox[blr]{8}{} 
+\bitbox[tlr]{24}{} \\
+\wordbox[lr]{7}{Vault ID hash} \\
+\begin{rightwordgroup}{Multiple times}
+\bitbox[blr]{8}{} 
+\bitbox{8}{\tiny Number of clients} 
+\bitbox[tlr]{16}{} \\
+\wordbox[lr]{7}{Client public key} \\
+\bitbox[blr]{8}{} 
+\bitbox{8}{\tiny Device name length}
+\bitbox[tlr]{16}{} \\
+\wordbox[blr]{2}{Device name}
+\end{rightwordgroup}
+\end{bytefield}
+\caption*{Découverte des clients réponse}
+\end{figure}
+
+\begin{figure}
+\centering
+\begin{bytefield}{32}
+\bitheader{0-31} \\
+\bitbox{8}{Type}
+\bitbox[tlr]{24}{} \\
+\wordbox[lr]{7}{Sender register ID hash} \\
+\bitbox[blr]{8}{} 
+\bitbox[tlr]{24}{} \\
+\wordbox[lr]{7}{New sender public key} \\
+\bitbox[blr]{8}{} 
+\bitbox{16}{Update length}
+\bitbox[trl]{8}{} \\
+\wordbox[lr]{2}{Update} \\
+\skippedwords \\
+\wordbox[blr]{1}{}
+\end{bytefield}
+\caption*{Mise à jour du coffre}
+\end{figure}
+
+\end{document}
