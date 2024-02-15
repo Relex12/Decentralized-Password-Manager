@@ -33,18 +33,7 @@ Les échanges entre les clients et le serveur du gestionnaire de mots de passe s
 * identifiant utilisateur et identifiant du coffre : $UID$ et $VID$
 * clé éphémère symétrique : $EKsc=ecdh(PKs,SKc)=ecdh(PKc,SKs)$
 
-```mermaid
-sequenceDiagram
-	participant TE as Téléphone / Email
-    participant C as Client
-    participant S as Serveur
-    C -> S: TLS Handshake
-    C ->> S: cipher(EKsc, UID+PKc+hash(VID))
-    S ->> TE: Challenge code
-    C ->> S: cipher(EKsc, Réponse challenge)
-    Note over S: Enregistre HRID dans le filtre de Bloom
-    S ->> C: cipher(EKsc, Info OK)
-```
+![register-sequence-diagram-full](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/04-register-sequence-diagram-full.png)
 
 ### Découverte des clients et chiffrement avec le serveur
 
@@ -68,37 +57,7 @@ sequenceDiagram
 * message chiffré de bout en bout : $message=cipher(IKabc,hash(UID)+hash(VID)+PKa+PKb+PKc)$
 * numéro de sécurité : $SNabc=hash(HRIDa+HRIDb+HRIDc)$
 
-```mermaid
-sequenceDiagram
-    participant A as Client A
-    participant S as Serveur
-    participant B as Client B
-    participant C as Client C
-    par
-    B ->> A: PKb
-    and
-    C ->> A: PKc
-    end
-    A -> S: TLS Handshake
-    A ->> S: cipher(EKsa, HRIDa+HRIDb+HRIDc+message)
-    Note over S: Vérifie HRIDa HRIDb et HRIDc enregistrés
-    Note over S: Ajoute message en file d'attente pour HRIDb et HRIDc
-    par
-    B -> S: TLS Handshake
-    B ->> S: cipher(EKsb, HRIDb)
-    S ->> B: cipher(EKsb, HRIDa+message)
-    Note over B: Déchiffre message avec IKabc
-    and
-    C -> S: TLS Handshake
-    C ->> S: cipher(EKsc, HRIDc)
-    S ->> C: cipher(EKsc, HRIDa+message)
-    Note over C: Déchiffre message avec IKabc
-    end
-    Note over A: Vérifie SNabc
-    Note over S: Supprime message
-    Note over B: Vérifie SNabc
-    Note over C: Vérifie SNabc
-```
+![client-discovery-server-encryption-diagram-full](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/04-client-discovery-server-encryption-diagram-full.png)
 
 ### Envoi de messages entre clients
 
@@ -122,38 +81,7 @@ sequenceDiagram
     * $S2Kabc=pbdh(E1PKa,PKb,E1SKc)$
     * $S3Kabc=pbdh(E2PKa,PKb,E1SKc)$
 
-```mermaid
-sequenceDiagram
-    participant A as Client A
-    participant B as Client B
-    participant C as Client C
-    par
-    A ->> B: cipher(IKabc, E1PKa+message)
-    and
-    A ->> C: cipher(IKabc, E1PKa+message)
-    end
-    Note over A: Calcule S1Kabc avec E1SKa
-    Note over B: Calcule S1Kabc avec E1PKa
-    Note over C: Calcule S1Kabc avec E1PKa
-
-    par
-    C ->> A: cipher(S1Kabc, E1PKc+message)
-    and
-    C ->> B: cipher(S1Kabc, E1PKc+message)
-    end
-    Note over A: Calcule S2Kabc avec E1PKc
-    Note over B: Calcule S2Kabc avec E1PKc
-    Note over C: Calcule S2Kabc avec E1SKc
-
-    par
-    A ->> B: cipher(S2Kabc, E2PKa+message)
-    and
-    A ->> C: cipher(S2Kabc, E2PKa+message)
-    end
-    Note over A: Calcule S3Kabc avec E2SKa
-    Note over B: Calcule S3Kabc avec E2PKa
-    Note over C: Calcule S3Kabc avec E2PKa
-```
+![client-messages-diagram-full](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/04-client-messages-diagram-full.png)
 
 ## Structures de données
 
@@ -161,7 +89,7 @@ sequenceDiagram
 
 Le gestionnaire de mots de passe est composé de deux couches : l'échange de messages entre les clients et le serveur fournit une couche de service qui est utilisée par les messages entre clients pour être transportés et chiffrés de bout en bout.
 
-La couche de service du gestionnaire de mot de passe repose sur la couche session du modèle OSI, toutes les trames qui suivent sont donc encapsulées dans des messages TLS et surviennent après le *handshake TLS*, c'est-à-dire la récupération du certificat du serveur et la création d'un secret partagées. Tous les messages entre les clients et le serveur sont chiffrés.
+La couche de service du gestionnaire de mot de passe repose sur la couche session du modèle OSI, toutes les trames qui suivent sont donc encapsulées dans des messages TLS et surviennent après le *handshake TLS*, c'est-à-dire la récupération du certificat du serveur et la création d'un secret partagée. Tous les messages entre les clients et le serveur sont chiffrés.
 
 ### Requêtes de la couche service (client vers serveur)
 
@@ -172,14 +100,20 @@ La couche de service du gestionnaire de mot de passe repose sur la couche sessio
     * taille de l'identifiant utilisateur (8 bits)
     * identifiant utilisateur (jusqu'à 255 octets)
 
+    ![register-request-datagram](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/04-register-request-datagram.jpg)
+
 * Envoi de la réponse au challenge
     * type de requête (8 bits)
     * hachage de l'identifiant d'enregistrement (256 bits)
     * réponse (8 octets)
 
+    ![challenge-response-datagram](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/04-challenge-response-datagram.jpg)
+
 * Demande de récupération de message
     * type de requête (8 bits)
     * hachage de l'identifiant d'enregistrement (256 bits)
+
+    ![message-retrieval-datagram](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/04-message-retrieval-datagram.jpg)
 
 * Demande d'ajout de message en file d'attente
     * type de requête (8 bits)
@@ -189,11 +123,15 @@ La couche de service du gestionnaire de mot de passe repose sur la couche sessio
     * taille du message (16 bits)
     * message (jusqu'à 65535 octets)
 
+    ![message-addition-datagram](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/04-message-addition-datagram.jpg)
+
 ### Réponses de la couche service (serveur vers client)
 
 * Info ou Erreur
     * type de réponse (8 bits)
     * code (8 bits)
+
+    ![info-error-datagram](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/04-info-error-datagram.jpg)
 
     > Lorsque le serveur transmet une information ou une erreur au client, il utilise le même type de trame et transmet le code de l'information ou de l'erreur. Les cas de figure sont par exemple :
     > * info : confirmation d'enregistrement
@@ -210,16 +148,21 @@ La couche de service du gestionnaire de mot de passe repose sur la couche sessio
     * taille du message (16 bits)
     * message (jusqu'à 65535 octets)
 
+    ![pending-messages-sending-datagram](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/04-pending-messages-sending-datagram.jpg)
+
 ### Messages de la couche application (entre clients)
 
-> Ces messages sont indépendants de la couche service décrite ci-dessus, si bien que les trames échangées entre clients sont identiques qu'elles soient transmises via le serveur ou via un autre moyen comme le Bluetooth, QR Code ou le protocole ICE.
+> Ces messages sont indépendants de la couche service décrite ci-dessus, si bien que les trames échangées entre clients sont identiques qu'elles soient transmises via le serveur ou via un autre moyen comme le Bluetooth, le QR Code ou le protocole ICE.
 
-* Découverte des clients
+* Découverte des clients requête
     * type de message (8 bits)
     * clé publique (256 bits)
 
-    > Ce message initial ne contient aucune information sur le coffre car il n'est pas chiffré de bout en bout, le serveur pourrait l'intercepter et récupérer ses données.
+    ![client-discovery-request-datagram](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/04-client-discovery-request-datagram.jpg)
 
+    > Ce message initial ne contient aucune information sur le coffre car il n'est pas chiffré de bout en bout, le serveur pourrait l'intercepter et récupérer ses données. Comme l'émetteur ne connait pas encore l'identifiant d'enregistrement du destinataire, ce message ne peut pas être envoyé via la couche service.
+
+* Découverte des clients réponse
     * type de message (8 bits)
     * clé publique de l'émetteur (256 bits)
     * hachage de l'identifiant utilisateur (256 bits)
@@ -228,6 +171,8 @@ La couche de service du gestionnaire de mot de passe repose sur la couche sessio
         * clé publique du client (256 bits)
         * taille du nom de l'appareil (8 bits)
         * nom de l'appareil pour l'utilisateur (jusqu'à 255 octets)
+
+    ![client-discovery-response-datagram](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/04-client-discovery-response-datagram.jpg)
 
     > Dans ce message, la clé publique de l'émetteur et le type de message ne sont pas chiffrés de bout en bout. Le reste est chiffré de bout en bout de manière pair-à-pair, ce message doit être stocké plusieurs fois sur le serveur et possède donc une date de péremption plus courte.
 
@@ -240,7 +185,9 @@ La couche de service du gestionnaire de mot de passe repose sur la couche sessio
     * taille de la mise à jour (16 bits)
     * mise à jour (jusqu'à 65468 octets)
 
-    > La taille maximale du message est de 65535 octets tous champs inclus car du point de vue de la couche service, la taille du message est décrite dans un champs de 16 bits.
+    ![chest-update-datagram](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/04-chest-update-datagram.jpg)
+
+    > La taille maximale du message est de 65535 octets tous champs inclus car du point de vue de la couche service, la taille du message est décrite dans un champs de 16 bits. C'est pour cela que la mise à jour possède une taille maximale de 65468 octets.
 
 ### Champs des trames
 
