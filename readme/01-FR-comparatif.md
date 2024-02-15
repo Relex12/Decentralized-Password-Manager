@@ -90,7 +90,7 @@ C'est le fonctionnement de base d'un gestionnaire de mots de passe. Tous vos mot
 
 Une fois que vous avez besoin d'accéder à vos mots de passe, pour vous connecter quelque part par exemple, il vous suffit de rentrer votre mot de passe maître dans votre gestionnaire de mot de passe pour déchiffrer le fichier qui contient tous vos mots de passe.
 
-![](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/encrypted-file.png)
+![](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/01-encrypted-file.png)
 
 *Exemple* : KeePass
 
@@ -104,9 +104,9 @@ Pour parvenir à synchroniser vos mots de passe entre différents appareils, de 
 
 Ici le service qui vous est vendu, c'est celui d'avoir à disposition, dans un serveur d'une entreprise privée, vos mots de passe sous la forme d'un fichier chiffré. Ainsi, n'importe où dans le monde et à n'importe quel moment, vous pouvez vous connecter à votre compte et récupérer vos mots de passe. De la même manière, quand vous ajoutez des nouveaux mots de passe, le fichier chiffré est mis à jour, la synchronisation est donc totale.
 
-![](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/server-stored.png)
+![](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/01-server-stored.png)
 
-![](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/server-pulled.png)
+![](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/01-server-pulled.png)
 
 *Exemples* : 1PassWord, BitWarden, NordPass, Dashlane, etc.
 
@@ -119,7 +119,7 @@ Ici le service qui vous est vendu, c'est celui d'avoir à disposition, dans un s
 
 Puisque le problème est de stocker le fichier chiffré quelque part, les solutions stateless proposent une toute nouvelle approche : au lieu de stocker les mots de passe pour que vous puissiez y accéder pour vous connecter sur vos sites, il est question ici de *calculer* vos mots de passe à partir de votre mot de passe maître et d'informations comme le nom du site. Plus besoin de *stocker* vos mots de passe : comme le mot de passe de votre site est *calculé*, il vous suffit de fournir les mêmes informations d'une connexion sur l'autre avoir votre mot de passe.
 
-![](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/stateless.png)
+![](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/01-stateless.png)
 
 *Exemple* : LessPass
 
