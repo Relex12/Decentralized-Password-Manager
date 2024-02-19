@@ -36,7 +36,11 @@ Lorsqu'un client récupère une mise à jour sans action de l'utilisateur, les m
 
 ### État des autres clients
 
-Le client d'un coffre de mots de passe peuvent faire une requête vers le serveur afin de savoir quels autres clients du même coffre ont des messages en liste d'attente qui doivent être récupérés. Cela permet à l'utilisateur de déterminer à partir de n'importe quel appareil le nombre d'appareils qui ne sont pas à jours et le temps qui lui reste pour les synchroniser. 
+Le client d'un coffre de mots de passe peuvent faire une requête vers le serveur afin de savoir quels autres clients du même coffre ont des messages en liste d'attente qui doivent être récupérés. Cela permet à l'utilisateur de déterminer à partir de n'importe quel appareil le nombre d'appareils qui ne sont pas à jours et le temps qui lui reste pour les synchroniser.
+
+### Informations d'utilisation
+
+Les clients d'un coffre peuvent conserver des informations relatives à l'utilisation des secrets contenus dans le coffre, comme la date de création, la date de la dernière modification ou la date de la dernière utilisation. Ces informations sont stockées sur chaque client individuellement à titre indicatif pour l'utilisateur, elles ne sont pas transmises au autres clients.
 
 ### Multi-coffre
 
