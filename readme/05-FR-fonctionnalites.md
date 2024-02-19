@@ -72,8 +72,6 @@ La mise à jour du mot de passe partagé entre les appareils liés passe par la 
 
 Les clients d'un coffre peuvent ajouter un client extérieur comme client de secours. Le client de secours est ajouté au coffre comme un secret, afin d'être partagé et mis à jour entre les clients comme le reste du coffre. L'appareil de secours extérieur peut permettre de récupérer le mot de passe maître du coffre d'un utilisateur en cas d'oubli ou malheureusement de décès.
 
->  quid du cas de la perte de tous les appareils ?
-
 Pour enregistrer un appareil de secours extérieur, ce client maître doit ajouter le hachage de l'identifiant d'enregistrement de l'appareil de secours et calculer une partie du mot de passe maître. La récupération du mot de passe maître se fait grâce au calcul multipartite sécurisé ou à un cryptosystème à seuil, c'est-à-dire au calcul d'une valeur secrète qui nécessite la collaboration de toutes les personnes qui possèdent une partie du secret. Ici, l'appareil maître calcule les deux parties nécessaires à la reconstitution du mot de passe, il partage une partie aux autres appareils en l'ajoutant au coffre, puis il transmet l'autre partie à l'appareil de secours extérieur qui devra obligatoirement la conserver au sein d'un coffre. Pour les appareils appartenant au coffre auquel est rattaché l'appareil de secours, la partie doit également être stockée sans chiffrement, afin d'être accessible lorsque le client est verrouillé.
 
 Lorsque l'utilisateur d'un appareil de secours extérieur souhaite récupérer le mot de passe maître du coffre dont il est le secours, il doit manipuler l'un des appareils appartenant au coffre et initier une procédure de récupération de mot de passe maître. Le client va alors envoyer un message en utilisant la couche service du gestionnaire de mots de passe pour transmettre sa partie au client de secours extérieur. Le serveur ne doit rendre disponible le message pour le client de secours qu'après un délai, pour éviter que l'utilisateur de confiance ne fasse la procédure sans l'accord de l'utilisateur. Une fois que le message est disponible, le client de secours extérieur peut le récupérer et calculer le mot de passe maître.
@@ -85,4 +83,66 @@ Un appareil de secours n'est lié qu'à un seul coffre de mots de passe. Si l'ut
 Si l'appareil de secours extérieur venait à ne plus être utilisable, pour cause de perte, de vol ou de renouvellement, il faut également recommencer la procédure. L'appareil maître doit alors mettre à jour le secret dans coffre pour les autres appareils.
 
 > Cette fonctionnalité doit faire l'objet d'une étude plus aboutie sur sa faisabilité.
+
+### Client de sauvegarde
+
+L'utilisateur peut également utiliser un périphérique de stockage externe pour sauvegarder ses coffres. Le périphérique de stockage externe, clé USB ou carte SD par exemple, est alors utilisée pour conserver les données chiffrées du coffre. Le périphérique est formatté avant d'être écrit, l'ensemble de l'espace de stockage est chiffré de la même manière que s'il s'agissait de l'espace mémoire d'un appareil ayant accès au coffre. Le périphérique de stockage est alors un client de sauvegarde, il interagit avec le coffre de la même manière qu'un client copie, il est mis à jour depuis n'importe quel client du coffre qui devient alors un client proxy.
+
+L'utilisation du périphérique de stockage pour un client de sauvegarde n'est pas la même que dans le cas d'une communication entre des clients, mais le même périphérique peut être utilisé, à condition d'espace mémoire suffisant. À ce moment-là, le périphérique de stockage contient à la fois le coffre chiffré en temps que client de sauvegarde, et la mise à jour du coffre chiffrée de bout en bout à transmettre à un autre client, notamment suite à la péremption de messages sur le serveur. Les informations d'un coffre vont systématiquement du client enregistré vers le client de sauvegarde, le client de sauvegarde ne peut jamais mettre à jour un autre client.
+
+Du point de vue du client de sauvegarde, le client enregistré n'est qu'un lecteur pour le périphérique de stockage. Chaque client aura deux modes de fonctionnement : le stockage local qui est le fonctionnement par défaut et le stockage externe pour les clients de sauvegarde. Comme le contenu stocké est chiffré, d'un point de vue extérieur le périphérique est inexploitable sans un client du gestionnaire de mot de passe.
+
+Le client de sauvegarde permet même à l'utilisateur de récupérer ses mots de passe depuis un client qui n'est pas enregistré auprès du coffre. En connectant le périphérique à un appareil et en renseignant le mot de passe maître dans le client, l'utilisateur peut accéder à ses mots de passe tels qu'ils ont été sauvegardés.
+
+> Il est possible de concevoir et de vendre des appareils électroniques sécurisés compatibles et prêts à l'emploi pour ce cas d'usage, d'une manière similaire à la YubiKey.
+
+Cette fonctionnalité ne permet la récupération du coffre en cas de perte de tous les autres appareils.
+
+## Sécurité
+
+### Saisie de mot de passe maître
+
+Dans la plupart des applications ou sites web avec lesquels sont amenés à interagir les utilisateurs, l'entrée des mots de passe se fait en masquant chaque caractère lors de la saisie, en utilisant des astérisques `*` ou des gros points `•`. Il est même possible que le caractère tapé reste une fraction de seconde avant d'être remplacé afin de vérifier les fautes de frappes.
+
+Ce mode de saisie permet à un observateur malveillant de connaître la taille du mot de passe, ce qui facilite grandement les attaques par force brute. Pour remédier à cela, il est possible de ne pas ajouter un caractère masqué lors de la saisie d'un nouveau caractère, mais de signaler l'entrée d'un nouveau caractère via un clignotement du dernier caractère masqué ou en faisant apparaître le dernier caractère tapé une fraction de seconde.
+
+Les outils en ligne de commande sur UNIX/Linux ont une solution plus efficace encore : ils n'écrivent aucun caractère lors de la saisie d'un mot de passe, le champ reste vide jusqu'à ce que l'utilisateur appuie sur Entrée.
+
+Le gestionnaire de mot de passe permettra de choisir entre les modes de saisie du mot de passe maître que préfère l'utilisateur.
+
+### Changement du mot de passe maître
+
+L'utilisateur pourra modifier son mot de passe maître depuis l'un de ses appareils. Le mot de passe maître est utilisé pour déchiffrer la mémoire du client, ce changement mot de passe a pour conséquence de changer la clé de ce chiffrement. Le mot de passe maître sera ajouté au coffre comme un secret particulier. Une fois que le mot de passe est modifié sur l'un des clients, la modification peut être récupérée par les autres clients et appliquée à réception. À ce moment, l'utilisateur peut être informé que son mot de passe maître est modifié par la dernière mise-à-jour du coffre, afin de valider ce changement.
+
+### Double authentification
+
+Pour authentifier l'utilisateur sur un client, le gestionnaire de mot de passe pourra demander une double authentification, c'est-à-dire le renseignement du mot de passe maître et une autre méthode d'authentification. Les clients devront supporter la biométrie pour les appareils qui en possèdent (reconnaissance faciale, empreinte digitale ou autre).
+
+Les clients, notamment en ligne de commande, pourront accepter l'authentification par clé publique. Le gestionnaire de mot de passe sera également compatible avec les dispositifs d'authentification électronique du style YubiKey, qui se compose d'une clé physique qui stocke des clés cryptographiques à l'intérieur.
+
+Le gestionnaire de mot de passe supportera également la double authentification à base de mot de passe à usage unique (*One Time Password* ou *OTP*). Cette méthode permet de générer des codes à usage unique qui sont produits depuis un appareil, électronique ou via une application comme FreeOTP ou les Authenticator de Microsoft ou Google par exemple. Le client peut alors s'assurer de l'authentification car l'utilisateur a accès au secret commun qui lui permet de calculer le bon code.
+
+### Générateur de mot de passe
+
+Le gestionnaire de mots de passe proposera la possibilité de générer des mots de passe forts pour l'utilisateur. Comme l'utilisateur n'a plus besoin de retenir ses mots de passe, ceux-ci peuvent extrêmement robustes en étant longs et ayant de nombreux caractères spéciaux. Cette fonctionnalité reposera sur la génération de nombre aléatoire (*Random Number Generator* ou *RNG*) des appareils, lesquels font l'objet d'une vérification minutieuse.
+
+### Outils de détection de mots de passe faibles
+
+Le gestionnaire de mots de passe proposera également la possibilité d'analyser ses mots de passes, afin de rechercher des motifs comme des noms ou des formats de date, vérifier la longueur et l'utilisation de majuscules, minuscules, chiffres et caractères spéciaux, vérifier la réutilisation de mots de passe ou de parties de mots de passe.
+
+La recherche de vulnérabilité dans les mots de passe peut également être réalisée en profondeur, grâce à des outils de vérification de robustesse comme John the Ripper ou la recherche des identifiants et mots de passe dans des fuites de données comme Have i been pwned.
+
+Ces analyses ne peuvent être réalisées que sur les mots de passe déchiffrés. Comme la manipulation de données déchiffrées est sensibles, le gestionnaire de mots de passe ne fera ces analyses automatiquement, sauf demandé explicitement par l'utilisateur.
+
+### Numéro de sécurité
+
+Afin de vérifier que son coffre de mots de passe est sécurisé, l'utilisateur sera amené à vérifier son numéro de sécurité. Pour cela, l'utilisateur doit accéder à plusieurs appareils simultanément et vérifier que ce numéro, une suite de quelques dizaines de chiffres, est identique sur chacun. Le numéro de sécurité peut également être vérifié via QR Code, mais pas via Bluetooth ou autre afin de limiter les risques d'attaque. Le numéro de sécurité est calculé grâce à une fonction de hachage sur le hachage des identifiants d'enregistrement de tous les client du coffre. Si le numéro est identique sur chaque appareil, c'est que tous les clients se connaissent effectivement correctement et que le coffre est sécurisé. L'utilisateur peut ensuite marquer ses appareils comme étant vérifiés.
+
+Un second numéro de sécurité peut être calculé pour vérifier que les clients sont synchronisés. L'utilisateur peut ainsi vérifier si tous ses appareils sont à jour ou si certains doivent récupérer des messages en attente. Cette vérification doit également être faite manuellement par l'utilisateur en comparant les deux valeurs. Ce second numéro de sécurité est calculé grâce à une fonction de hachage sur le coffre chiffré. Si les numéros de sécurité diffèrent, cela signifie qu'un client au moins n'est pas à jour, il n'y a compromission des données tant que le premier numéro de sécurité est identique.
+
+### Chiffrement du stockage multi-niveau
+
+Dans la mémoire de l'appareil, les coffres d'un client sont stockés sous forme chiffrée. Ce chiffrement est effectué à deux niveaux, d'abord chaque fichier de secret est chiffré individuellement, puis l'ensemble des données du coffre, c'est-à-dire les fichiers de secret chiffrés mais aussi les identifiants d'enregistrement des autres clients et la clé partagée sont chiffrés une seconde fois. Ceci permet d'éviter la manipulation de ressources déchiffrées au niveau de l'appareil de l'utilisateur. Dans le système d'exploitation, les données sont déchiffrées uniquement lorsque l'utilisateur souhaite y accéder, en lecteur ou en écriture. Le reste du temps, même lorsque le client est ouvert, les données sensibles restent chiffrées.
+
+Selon les recommandations de sécurité, il est possible que la clé de chiffrement individuel des fichiers de secret ne soit pas dérivée du mot de passe maître mais stockée de manière chiffrée dans le coffre et protégée par le droit d'accès aux ressources du système d'exploitation. Si une telle clé est mise en place, elle sera créée par chaque client indépendamment et ne sera jamais partagée entre eux. Ce n'est pas un problème puisque cette clé ne sert qu'à chiffrer les données stockées localement, le résultat de ce chiffrement ne transite jamais entre les clients. Cette clé supplémentaire sert à empêcher la possibilité d'utiliser une copie de la mémoire du coffre, même si l'attaquant connait le mot de passe maître. 
 
