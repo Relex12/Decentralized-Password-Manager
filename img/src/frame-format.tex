@@ -139,13 +139,27 @@
 \bitbox{8}{\tiny Number of clients} 
 \bitbox[tlr]{16}{} \\
 \wordbox[lr]{7}{Client public key} \\
-\bitbox[blr]{8}{} 
-\bitbox{8}{\tiny Device name length}
-\bitbox[tlr]{16}{} \\
-\wordbox[blr]{2}{Device name}
+\bitbox[blr]{16}{}
+\bitbox[tl]{16}{}
 \end{rightwordgroup}
 \end{bytefield}
 \caption*{Découverte des clients réponse}
+\end{figure}
+
+\begin{figure}
+\centering
+\begin{bytefield}{32}
+\bitheader{0-31} \\
+\bitbox{8}{Type}
+\bitbox[tlr]{24}{} \\
+\wordbox[lr]{7}{Register ID hash} \\
+\bitbox[blr]{8}{}
+\bitbox{8}{\tiny Supported pairwise communications}
+\bitbox{8}{\tiny Device name length}
+\bitbox[tlr]{8}{} \\
+\wordbox[blr]{2}{Device name}
+\end{bytefield}
+\caption*{Informations des clients}
 \end{figure}
 
 \begin{figure}

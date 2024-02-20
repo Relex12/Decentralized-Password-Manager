@@ -181,14 +181,21 @@ La couche de service du gestionnaire de mot de passe repose sur la couche sessio
     * hachage de l'identifiant du coffre (256 bits)
     * nombre de clients dans le coffre (8 bits)
         * clé publique du client (256 bits)
-        * taille du nom de l'appareil (8 bits)
-        * nom de l'appareil pour l'utilisateur (jusqu'à 255 octets)
 
     ![client-discovery-response-datagram](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/04-client-discovery-response-datagram.jpg)
 
     > Dans ce message, la clé publique de l'émetteur et le type de message ne sont pas chiffrés de bout en bout. Le reste est chiffré de bout en bout de manière pair-à-pair, ce message doit être stocké plusieurs fois sur le serveur et possède donc une date de péremption plus courte.
 
     > Comme la requête correspondante n'est pas chiffrée et afin de limiter les données exploitables par le serveur, l'utilisateur devra noter le nom de ses appareils depuis l'appareil maître.
+
+* Informations des clients
+    * type de message (8 bits)
+    * hachage de l'identifiant d'enregistrement de l'émetteur du message (256 bits)
+    * communications pair-à-pair supportées (8 bits)
+    * taille du nom de l'appareil (8 bits)
+    * nom de l'appareil pour l'utilisateur (jusqu'à 255 octets)
+
+    ![client-information-datagram](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/04-client-information-datagram.jpg)
 
 * Mise à jour du coffre
     * type de message (8 bits)
