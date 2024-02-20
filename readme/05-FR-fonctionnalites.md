@@ -150,3 +150,22 @@ Dans la mémoire de l'appareil, les coffres d'un client sont stockés sous forme
 
 Selon les recommandations de sécurité, il est possible que la clé de chiffrement individuel des fichiers de secret ne soit pas dérivée du mot de passe maître mais stockée de manière chiffrée dans le coffre et protégée par le droit d'accès aux ressources du système d'exploitation. Si une telle clé est mise en place, elle sera créée par chaque client indépendamment et ne sera jamais partagée entre eux. Ce n'est pas un problème puisque cette clé ne sert qu'à chiffrer les données stockées localement, le résultat de ce chiffrement ne transite jamais entre les clients. Cette clé supplémentaire sert à empêcher la possibilité d'utiliser une copie de la mémoire du coffre, même si l'attaquant connait le mot de passe maître. 
 
+## Communication entre appareils
+
+### Découverte Bluetooth, caméra et ports
+
+Sur chaque appareil, le client va scanner le support du protocole Bluetooth, la présence d'une caméra, l'accès à l'interface graphique pour le client en ligne de commande et la présence de ports USB, USB-C, SD ou micro SD, afin de proposer à l'utilisateur les solutions de communication pair-à-pair adaptée entre chaque appareil.
+
+Une fois que la découverte des clients est réalisée et que les clients peuvent communiquer de manière chiffrée de bout en bout, ils peuvent s'échanger ces informations dans des trames prévues à cet effet. Ils peuvent en profiter pour s'échanger le nom des appareils pour l'utilisateur.
+
+### Découverte réseau
+
+Lorsqu'ils essaient de communiquer de façon pair-à-pair, les clients peuvent initier une découverte réseau afin de découvrir les potentiels clients qui seraient sur le même réseau local. Si c'est le cas, les clients peuvent échanger en direct sans passer par d'autres moyens de communication.
+
+Cette découverte ne peut pas être faite une seule fois après la découverte des autres clients comme pour les autres moyens de communication pair-à-pair car les appareils peuvent être déplacés et changer de réseau.
+
+Les trames correspondant à la découverte réseau ne sont pas encore spécifiées. Elles devront apporter un soin particulier à la sécurité, les deux attaques principales seraient la possibilité d'interagir avec un client qui n'est pas dans le coffre en usurpant une identité et la possibilité de récupérer un identifiant d'enregistrement pour attaquer plus tard le serveur. Cette découverte nécessite aussi que les utilisateurs ouvrent l'accès au réseau pour les clients.
+
+### Support du protocole ICE
+
+Les clients pourront utiliser en dernier recours le protocole ICE pour communiquer de façon pair-à-pair. Pour cela, les clients et le serveur doivent supporter le protocole. Comme décrit précédemment, l'implémentation du protocole sera faite selon les RFC décrivant les protocoles sous-jacents.
