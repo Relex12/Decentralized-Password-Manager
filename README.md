@@ -1,6 +1,6 @@
 # Decentralized-Password-Manager
 
-Spécifications et design d'un gestionnaire de mots de passe décentralisé synchronisé sans tiers de confiance 
+Spécifications et design d'un gestionnaire de mots de passe décentralisé synchronisé sans tiers de confiance
 
 ![](https://img.shields.io/github/license/Relex12/Decentralized-Password-Manager) ![](https://img.shields.io/github/repo-size/Relex12/Decentralized-Password-Manager) ![](https://img.shields.io/github/languages/top/Relex12/Decentralized-Password-Manager) ![](https://img.shields.io/github/last-commit/Relex12/Decentralized-Password-Manager) ![](https://img.shields.io/github/stars/Relex12/Decentralized-Password-Manager)
 
