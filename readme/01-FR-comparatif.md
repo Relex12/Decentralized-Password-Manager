@@ -88,7 +88,7 @@ Cette partie n'est pas nécessaire si vous cherchez uniquement une alternative g
 
 C'est le fonctionnement de base d'un gestionnaire de mots de passe. Tous vos mots de passe sont assemblés en un fichier chiffré sur votre disque dur grâce au mot de passe maître. De cette manière, une personne qui accéderait à votre ordinateur ne peut récupérer vos mots de passe sans connaître votre mot de passe maître.
 
-Une fois que vous avez besoin d'accéder à vos mots de passe, pour vous connecter quelque part par exemple, il vous suffit de rentrer votre mot de passe maître dans votre gestionnaire de mot de passe pour déchiffrer le fichier qui contient tous vos mots de passe.
+Une fois que vous avez besoin d'accéder à vos mots de passe, pour vous connecter quelque part par exemple, il vous suffit de rentrer votre mot de passe maître dans votre gestionnaire de mots de passe pour déchiffrer le fichier qui contient tous vos mots de passe.
 
 ![](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/01-encrypted-file.png)
 

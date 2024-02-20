@@ -1,6 +1,6 @@
 # Fonctionnalités
 
-Description des fonctionnalités additionnelles du gestionnaire de mot de passe sans modifier la communication entre les appareils
+Description des fonctionnalités additionnelles du gestionnaire de mots de passe sans modifier la communication entre les appareils
 
 [Menu principal](https://relex12.github.io/fr/Decentralized-Password-Manager)
 
@@ -87,7 +87,7 @@ Un appareil de secours au sein du coffre peut également être choisi par l'util
 
 Un appareil maître peut également accorder à des clients extérieurs au coffre la possibilité de devenir des clients copie. Un client copie ne fait pas partie de la liste des clients d'un coffre, il n'en reçoit pas directement les mises à jour, mais le client maître peut les lui transmettre lorsque lui-même les reçoit. Le client maître devient un proxy pour le client copie : le client copie se situe derrière le proxy et ne peut accéder aux mises à jour que lorsque celui-ci accepte de les lui transmettre.
 
-Comme les clients copie ne font pas partie du coffre, ils ne peuvent pas être mis à jour en utilisant la couche service du gestionnaire de mots de passe, ils sont obligatoirement synchronisés manuellement depuis l'appareil maître, via Bluetooth, QR Code ou protocole ICE.
+Comme les clients copie ne font pas partie du coffre, ils ne peuvent pas être mis à jour en utilisant la couche service du gestionnaire de mots de passe, ils sont obligatoirement synchronisés manuellement depuis l'appareil maître, via le Bluetooth, le QR Code ou le protocole ICE.
 
 >  Cette fonctionnalité est obligatoire dans le cas où le gestionnaire de mots de passe est limité à trois clients par coffre.
 
@@ -125,7 +125,7 @@ L'utilisation du périphérique de stockage pour un client de sauvegarde n'est p
 
 ---
 
-Du point de vue du client de sauvegarde, le client enregistré n'est qu'un lecteur pour le périphérique de stockage. Chaque client aura deux modes de fonctionnement : le stockage local qui est le fonctionnement par défaut et le stockage externe pour les clients de sauvegarde. Comme le contenu stocké est chiffré, d'un point de vue extérieur, le périphérique est inexploitable sans un client du gestionnaire de mot de passe.
+Du point de vue du client de sauvegarde, le client enregistré n'est qu'un lecteur pour le périphérique de stockage. Chaque client aura deux modes de fonctionnement : le stockage local qui est le fonctionnement par défaut et le stockage externe pour les clients de sauvegarde. Comme le contenu stocké est chiffré, d'un point de vue extérieur, le périphérique est inexploitable sans un client du gestionnaire de mots de passe.
 
 Le client de sauvegarde permet même à l'utilisateur de récupérer ses mots de passe depuis un client qui n'appartient pas au coffre. En connectant le périphérique à un appareil et en renseignant le mot de passe maître dans le client, l'utilisateur peut accéder à ses mots de passe tels qu'ils ont été sauvegardés.
 
@@ -143,7 +143,7 @@ Ce mode de saisie permet à un observateur malveillant de connaître la taille d
 
 Les outils en ligne de commande sur UNIX/Linux ont une solution plus efficace encore : ils n'écrivent aucun caractère lors de la saisie d'un mot de passe, le champ reste vide jusqu'à ce que l'utilisateur appuie sur Entrée.
 
-Le gestionnaire de mot de passe permettra de choisir entre les modes de saisie du mot de passe maître selon les préférences de l'utilisateur, pour offrir une meilleure sécurité.
+Le gestionnaire de mots de passe permettra de choisir entre les modes de saisie du mot de passe maître selon les préférences de l'utilisateur, pour offrir une meilleure sécurité.
 
 ### Changement du mot de passe maître
 
@@ -151,11 +151,11 @@ L'utilisateur pourra modifier son mot de passe maître depuis l'un de ses appare
 
 ### Double authentification
 
-Pour authentifier l'utilisateur sur un client, le gestionnaire de mot de passe pourra demander une double authentification, c'est-à-dire le renseignement du mot de passe maître et d'une autre méthode d'authentification. Pour les appareils qui possèdent de la biométrie, les clients devront supporter ces technologies (reconnaissance faciale, empreinte digitale, etc.).
+Pour authentifier l'utilisateur sur un client, le gestionnaire de mots de passe pourra demander une double authentification, c'est-à-dire le renseignement du mot de passe maître et d'une autre méthode d'authentification. Pour les appareils qui possèdent de la biométrie, les clients devront supporter ces technologies (reconnaissance faciale, empreinte digitale, etc.).
 
-Les clients, notamment en ligne de commande, pourront accepter l'authentification par clé publique. Le gestionnaire de mot de passe sera également compatible avec les dispositifs d'authentification électronique du style YubiKey, qui se compose d'une clé physique qui stocke des clés cryptographiques à l'intérieur.
+Les clients, notamment en ligne de commande, pourront accepter l'authentification par clé publique. Le gestionnaire de mots de passe sera également compatible avec les dispositifs d'authentification électronique du style YubiKey, qui se compose d'une clé physique qui stocke des clés cryptographiques à l'intérieur.
 
-Le gestionnaire de mot de passe supportera également la double authentification à base de mot de passe à usage unique (*One Time Password* ou *OTP*). Cette méthode permet de générer des codes à usage unique qui sont produits depuis un appareil, électronique ou via une application comme FreeOTP ou les Authenticator de Microsoft ou Google par exemple. Le client peut alors s'assurer de l'authentification car l'utilisateur a accès au secret commun qui lui permet de calculer le bon code.
+Le gestionnaire de mots de passe supportera également la double authentification à base de mot de passe à usage unique (*One Time Password* ou *OTP*). Cette méthode permet de générer des codes à usage unique qui sont produits depuis un appareil, électronique ou via une application comme FreeOTP ou les Authenticator de Microsoft ou Google par exemple. Le client peut alors s'assurer de l'authentification car l'utilisateur a accès au secret commun qui lui permet de calculer le bon code.
 
 ### Générateur de mot de passe
 
@@ -171,7 +171,7 @@ Ces analyses ne peuvent être réalisées que sur les mots de passe déchiffrés
 
 ### Numéro de sécurité
 
-Afin de vérifier que son coffre de mots de passe est sécurisé, l'utilisateur sera amené à vérifier son numéro de sécurité. Pour cela, l'utilisateur doit accéder à plusieurs appareils simultanément et vérifier que ce numéro, c'est-à-dire une suite de quelques dizaines de chiffres, est identique sur chacun. Le numéro de sécurité peut également être vérifié via QR Code, mais pas via Bluetooth ou autre afin de limiter les risques d'attaque. Le numéro de sécurité est calculé grâce à une fonction de hachage sur le hachage des identifiants d'enregistrement de tous les client du coffre. Si le numéro est identique sur chaque appareil, c'est que tous les clients se connaissent effectivement correctement et que le coffre est sécurisé. L'utilisateur peut ensuite marquer ses appareils comme étant vérifiés.
+Afin de vérifier que son coffre de mots de passe est sécurisé, l'utilisateur sera amené à vérifier son numéro de sécurité. Pour cela, l'utilisateur doit accéder à plusieurs appareils simultanément et vérifier que ce numéro, c'est-à-dire une suite de quelques dizaines de chiffres, est identique sur chacun. Le numéro de sécurité peut également être vérifié via le QR Code, mais pas via le Bluetooth ou autre afin de limiter les risques d'attaque. Le numéro de sécurité est calculé grâce à une fonction de hachage sur le hachage des identifiants d'enregistrement de tous les client du coffre. Si le numéro est identique sur chaque appareil, c'est que tous les clients se connaissent effectivement correctement et que le coffre est sécurisé. L'utilisateur peut ensuite marquer ses appareils comme étant vérifiés.
 
 Un second numéro de sécurité peut être calculé pour vérifier que les clients sont synchronisés. L'utilisateur peut ainsi vérifier si tous ses appareils sont à jour ou si certains doivent récupérer des messages en attente. Cette vérification doit également être faite manuellement par l'utilisateur en comparant les valeurs deux à deux. Ce second numéro de sécurité est calculé grâce à une fonction de hachage sur le coffre chiffré. Si ce numéros de sécurité diffèrent, cela signifie qu'un client au moins n'est pas à jour, il n'y a pas de compromission des données tant que le premier numéro de sécurité est identique.
 
