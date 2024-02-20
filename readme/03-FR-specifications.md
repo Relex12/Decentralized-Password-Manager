@@ -77,7 +77,7 @@ Afin de préserver l'anonymat lors des futures requêtes, le serveur n'enregistr
 
 L'utilisateur envoie une requête d'enregistrement au serveur depuis un client avec l'identifiant d'enregistrement `user_id:client_public_key:vault_id`. Le serveur envoie un challenge, c'est-à-dire un code à usage unique, via email ou SMS grâce à l'identifiant utilisateur, puis répond au client que le challenge a été envoyé. L'utilisateur doit saisir le code dans le client qui va l'envoyer au serveur. Le serveur ajoute ensuite l'utilisateur dans un filtre de Bloom et répond une confirmation d'enregistrement au client. La communication peut se terminer.
 
-![register-sequence-discovery-diagram](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/03-register-sequence-diagram.png)
+![register sequence discovery diagram](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/03-register-sequence-diagram.png)
 
 À l'issu de l'enregistrement, le coffre n'est pas encore partagé entre les appareils. Plus spécifiquement, les clients qui doivent se partager le coffre ne se connaissent pas encore.
 
@@ -165,7 +165,7 @@ L'utilisateur doit donc relier ses appareils entre eux en plus de les enregistre
 
 * **méthode diffusion** : chaque appareil envoie toutes les identités qu'il connait à tous les appareils qu'il ne connait pas encore, chaque appareil répond toutes les identités qu'il connait et que l'autre appareil ne connait pas
 
-	![diffusion-discovery-diagram](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/03-diffusion-discovery-diagram.png)
+	![diffusion discovery diagram](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/03-diffusion-discovery-diagram.png)
 
 	* *point négatif* : de nombreux messages sont inutiles
 	* *point négatif* : le très grand nombre d'échanges nécessaires, $n(n-1)$ pour $n$ appareils
@@ -175,7 +175,7 @@ L'utilisateur doit donc relier ses appareils entre eux en plus de les enregistre
 
 * **méthode circulaire** : le premier appareil envoie son identité au deuxième, le deuxième envoie son identité et celle du premier au troisième, etc., jusqu'au dernier qui envoie toutes les identités au premier
 
-	![circular-discovery-diagram](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/03-circular-discovery-diagram.png)
+	![circular discovery diagram](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/03-circular-discovery-diagram.png)
 
 	* *point négatif* : les échanges doivent être réalisés dans un ordre précis
 	* *point positif* : le faible nombre d'échanges nécessaires, $n$ pour $n$ appareils
@@ -184,7 +184,7 @@ L'utilisateur doit donc relier ses appareils entre eux en plus de les enregistre
 
 * **méthode maître** : dans un premier temps un appareil maître reçoit l'identité de chaque autre, ensuite le maître envoie toutes les identités à chacun
 
-	![master-discovery-diagram](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/03-master-discovery-diagram.png)
+	![master discovery diagram](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/03-master-discovery-diagram.png)
 
 	* *point négatif* : le nombre d'échanges nécessaires, $2(n-1)$ pour $n$ appareils
 	* *point positif* : les échanges peuvent être unidirectionnels
