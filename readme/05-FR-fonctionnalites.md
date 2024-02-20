@@ -8,7 +8,36 @@ Description des fonctionnalités additionnelles du gestionnaire de mot de passe 
 
 ## Sommaire
 
-[toc]
+* [Fonctionnalités](#fonctionnalités)
+    * [Sommaire](#sommaire)
+    * [Développement](#développement)
+        * [Plateformes](#plateformes)
+        * [Langage](#langage)
+        * [Licence et accès des sources](#licence-et-accès-des-sources)
+    * [Gestion des appareils](#gestion-des-appareils)
+        * [Démarrage en tâche de fond et récupération passive](#démarrage-en-tâche-de-fond-et-récupération-passive)
+        * [État des autres clients](#état-des-autres-clients)
+        * [Informations d'utilisation](#informations-d'utilisation)
+        * [Multi-coffre](#multi-coffre)
+        * [Appareil maître et gestion des appareils](#appareil-maître-et-gestion-des-appareils)
+        * [Clients copie et proxy](#clients-copie-et-proxy)
+        * [Partage de mot de passe](#partage-de-mot-de-passe)
+        * [Appareil de secours extérieur](#appareil-de-secours-extérieur)
+        * [Client de sauvegarde](#client-de-sauvegarde)
+    * [Sécurité](#sécurité)
+        * [Saisie de mot de passe maître](#saisie-de-mot-de-passe-maître)
+        * [Changement du mot de passe maître](#changement-du-mot-de-passe-maître)
+        * [Double authentification](#double-authentification)
+        * [Générateur de mot de passe](#générateur-de-mot-de-passe)
+        * [Outils de détection de mot de passe faible](#outils-de-détection-de-mot-de-passe-faible)
+        * [Numéro de sécurité](#numéro-de-sécurité)
+        * [Chiffrement du stockage multi-niveau](#chiffrement-du-stockage-multi-niveau)
+    * [Communication entre appareils](#communication-entre-appareils)
+        * [Découverte Bluetooth, caméra et ports](#découverte-bluetooth,-caméra-et-ports)
+        * [Découverte réseau](#découverte-réseau)
+        * [Support du protocole ICE](#support-du-protocole-ice)
+
+<!-- table of contents created by Adrian Bonnet, see https://Relex12.github.io/Markdown-Table-of-Contents for more -->
 
 ## Développement
 
