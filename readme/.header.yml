@@ -1,0 +1,5 @@
+header-includes:
+  - \usepackage{enumitem}
+  - \usepackage[french]{babel}
+  - \renewlist{itemize}{itemize}{20}
+  - \setlist[itemize]{label=\textbullet}
