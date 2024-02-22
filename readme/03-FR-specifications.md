@@ -6,6 +6,8 @@ Spécifications de la solution retenue et des implications pratiques
 
 [Page suivante : Implémentation](https://relex12.github.io/fr/Decentralized-Password-Manager/Implementation)
 
+> Attention : cette page contient des formules en LaTeX qui ne sont pas correctement supportées sur le site web, pour une meilleure expérience veuillez consultez la [page sur Github](https://github.com/Relex12/Decentralized-Password-Manager/blob/master/readme/03-FR-specifications.md).
+
 ## Sommaire
 
 * [Spécifications techniques](#spécifications-techniques)

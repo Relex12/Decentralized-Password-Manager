@@ -6,6 +6,8 @@ Détails sur la sécurité et l'implémentation algorithmique de la cryptographi
 
 [Page suivante : Fonctionnalités](https://relex12.github.io/fr/Decentralized-Password-Manager/Fonctionnalites)
 
+> Attention : cette page contient des formules en LaTeX qui ne sont pas correctement supportées sur le site web, pour une meilleure expérience veuillez consultez la [page sur Github](https://github.com/Relex12/Decentralized-Password-Manager/blob/master/readme/04-FR-implementation.md).
+
 ## Sommaire
 
 * [Sécurité](#sécurité)

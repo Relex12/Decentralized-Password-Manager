@@ -6,6 +6,8 @@
 
 [Page suivante : Spécifications](https://relex12.github.io/fr/Decentralized-Password-Manager/Specifications)
 
+> Attention : cette page contient des formules en LaTeX qui ne sont pas correctement supportées sur le site web, pour une meilleure expérience veuillez consultez la [page sur Github](https://github.com/Relex12/Decentralized-Password-Manager/blob/master/readme/02-FR-solutions.md).
+
 ## Sommaire
 
 * [Solutions techniques](#solutions-techniques)
