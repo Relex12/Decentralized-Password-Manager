@@ -1,6 +1,6 @@
-# Sécurité
+# Implémentation
 
-Détails sur la sécurité et l'implémentation algorithmique de la cryptographie et des échanges de message
+Détails sur l'implémentation des échanges de message et de l'utilisation de la cryptographie
 
 [Page précédente : Spécifications](https://relex12.github.io/fr/Decentralized-Password-Manager/Specifications)
 

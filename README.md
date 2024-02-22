@@ -15,5 +15,5 @@ Spécifications et design d'un gestionnaire de mots de passe décentralisé sync
 * [Comparatif](https://relex12.github.io/fr/Decentralized-Password-Manager/Comparatif)
 * [Solutions](https://relex12.github.io/fr/Decentralized-Password-Manager/Solutions)
 * [Spécifications](https://relex12.github.io/fr/Decentralized-Password-Manager/Specifications)
-* [Sécurité](https://relex12.github.io/fr/Decentralized-Password-Manager/Securite)
+* [Implémentation](https://relex12.github.io/fr/Decentralized-Password-Manager/Implementation)
 * [Fonctionnalités](https://relex12.github.io/fr/Decentralized-Password-Manager/Fonctionnalites)
