@@ -4,7 +4,7 @@ Description des fonctionnalités additionnelles du gestionnaire de mots de passe
 
 [Menu principal](https://relex12.github.io/fr/Decentralized-Password-Manager)
 
-[Page précédente : Sécurité](https://relex12.github.io/fr/Decentralized-Password-Manager/Securite)
+[Page précédente : Implémentation](https://relex12.github.io/fr/Decentralized-Password-Manager/Implementation)
 
 ## Sommaire
 

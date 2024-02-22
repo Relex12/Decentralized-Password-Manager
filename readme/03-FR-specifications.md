@@ -4,7 +4,7 @@ Spécifications de la solution retenue et des implications pratiques
 
 [Page précédente : Solutions](https://relex12.github.io/fr/Decentralized-Password-Manager/Solutions)
 
-[Page suivante : Sécurité](https://relex12.github.io/fr/Decentralized-Password-Manager/Securite)
+[Page suivante : Implémentation](https://relex12.github.io/fr/Decentralized-Password-Manager/Implementation)
 
 ## Sommaire
 
