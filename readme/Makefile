@@ -1,7 +1,7 @@
 all: pandoc clean
 
 
-tmp.md: *-FR-*.md
+tmp.md: 01-FR-comparatif.md  02-FR-solutions.md  03-FR-specifications.md  04-FR-implementation.md  05-FR-fonctionnalites.md
 	for file in $^ ; do cat $$file >> $@ ; echo '\n' >> $@ ; done
 
 tmp.html: tmp.md
@@ -16,6 +16,15 @@ wkhtmltopdf: tmp.html
 
 weasyprint: tmp.html
 	weasyprint --encoding utf-8 $< $@.pdf
+
+mdpdf: tmp.md
+	mdpdf $< $@.pdf
+
+md-to-pdf: tmp.md
+	cat $< | md-to-pdf > $@.pdf
+
+markdown-pdf: tmp.md
+	markdown-pdf $< --out $@.pdf
 
 
 clean:
