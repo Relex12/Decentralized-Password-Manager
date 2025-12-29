@@ -9,33 +9,33 @@ Description des fonctionnalités additionnelles du gestionnaire de mots de passe
 ## Sommaire
 
 * [Fonctionnalités](#fonctionnalités)
-    * [Sommaire](#sommaire)
-    * [Développement](#développement)
-        * [Plateformes](#plateformes)
-        * [Langage](#langage)
-        * [Licence et accès des sources](#licence-et-accès-des-sources)
-    * [Gestion des appareils](#gestion-des-appareils)
-        * [Démarrage en tâche de fond et récupération passive](#démarrage-en-tâche-de-fond-et-récupération-passive)
-        * [État des autres clients](#état-des-autres-clients)
-        * [Informations d'utilisation](#informations-d'utilisation)
-        * [Multi-coffre](#multi-coffre)
-        * [Appareil maître et gestion des appareils](#appareil-maître-et-gestion-des-appareils)
-        * [Clients copie et proxy](#clients-copie-et-proxy)
-        * [Partage de mot de passe](#partage-de-mot-de-passe)
-        * [Appareil de secours extérieur](#appareil-de-secours-extérieur)
-        * [Client de sauvegarde](#client-de-sauvegarde)
-    * [Sécurité](#sécurité)
-        * [Saisie de mot de passe maître](#saisie-de-mot-de-passe-maître)
-        * [Changement du mot de passe maître](#changement-du-mot-de-passe-maître)
-        * [Double authentification](#double-authentification)
-        * [Générateur de mot de passe](#générateur-de-mot-de-passe)
-        * [Outils de détection de mot de passe faible](#outils-de-détection-de-mot-de-passe-faible)
-        * [Numéro de sécurité](#numéro-de-sécurité)
-        * [Chiffrement du stockage multi-niveau](#chiffrement-du-stockage-multi-niveau)
-    * [Communication entre appareils](#communication-entre-appareils)
-        * [Découverte Bluetooth, caméra et ports](#découverte-bluetooth,-caméra-et-ports)
-        * [Découverte réseau](#découverte-réseau)
-        * [Support du protocole ICE](#support-du-protocole-ice)
+  * [Sommaire](#sommaire)
+  * [Développement](#développement)
+    * [Plateformes](#plateformes)
+    * [Langage](#langage)
+    * [Licence et accès des sources](#licence-et-accès-des-sources)
+  * [Gestion des appareils](#gestion-des-appareils)
+    * [Démarrage en tâche de fond et récupération passive](#démarrage-en-tâche-de-fond-et-récupération-passive)
+    * [État des autres clients](#état-des-autres-clients)
+    * [Informations d'utilisation](#informations-dutilisation)
+    * [Multi-coffre](#multi-coffre)
+    * [Appareil maître et gestion des appareils](#appareil-maître-et-gestion-des-appareils)
+    * [Clients copie et proxy](#clients-copie-et-proxy)
+    * [Partage de mot de passe](#partage-de-mot-de-passe)
+    * [Appareil de secours extérieur](#appareil-de-secours-extérieur)
+    * [Client de sauvegarde](#client-de-sauvegarde)
+  * [Sécurité](#sécurité)
+    * [Saisie de mot de passe maître](#saisie-de-mot-de-passe-maître)
+    * [Changement du mot de passe maître](#changement-du-mot-de-passe-maître)
+    * [Double authentification](#double-authentification)
+    * [Générateur de mot de passe](#générateur-de-mot-de-passe)
+    * [Outils de détection de mot de passe faible](#outils-de-détection-de-mot-de-passe-faible)
+    * [Numéro de sécurité](#numéro-de-sécurité)
+    * [Chiffrement du stockage multi-niveau](#chiffrement-du-stockage-multi-niveau)
+  * [Communication entre appareils](#communication-entre-appareils)
+    * [Découverte Bluetooth, caméra et ports](#découverte-bluetooth-caméra-et-ports)
+    * [Découverte réseau](#découverte-réseau)
+    * [Support du protocole ICE](#support-du-protocole-ice)
 
 <!-- table of contents created by Adrian Bonnet, see https://Relex12.github.io/Markdown-Table-of-Contents for more -->
 
@@ -81,7 +81,7 @@ En plus de son utilité lors de la découverte des clients ou pour l'ajout d'un 
 
 Un appareil de secours au sein du coffre peut également être choisi par l'utilisateur, seul appareil capable de devenir maître à la place du maître, en cas de perte ou de vol par exemple.
 
->  Cette fonctionnalité est obligatoire dans le cas où le gestionnaire de mots de passe est limité à trois clients par coffre.
+> Cette fonctionnalité est obligatoire dans le cas où le gestionnaire de mots de passe est limité à trois clients par coffre.
 
 ### Clients copie et proxy
 
@@ -89,7 +89,7 @@ Un appareil maître peut également accorder à des clients extérieurs au coffr
 
 Comme les clients copie ne font pas partie du coffre, ils ne peuvent pas être mis à jour en utilisant la couche service du gestionnaire de mots de passe, ils sont obligatoirement synchronisés manuellement depuis l'appareil maître, via le Bluetooth, le QR Code ou le protocole ICE.
 
->  Cette fonctionnalité est obligatoire dans le cas où le gestionnaire de mots de passe est limité à trois clients par coffre.
+> Cette fonctionnalité est obligatoire dans le cas où le gestionnaire de mots de passe est limité à trois clients par coffre.
 
 ### Partage de mot de passe
 

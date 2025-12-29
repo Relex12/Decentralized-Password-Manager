@@ -9,18 +9,18 @@ Comparaison des gestionnaires de mots de passe existants et de leurs modes de fo
 ## Sommaire
 
 * [Comparatif](#comparatif)
-    * [Sommaire](#sommaire)
-    * [Utilité du gestionnaire de mots de passe](#utilité-du-gestionnaire-de-mots-de-passe)
-    * [Fonctionnement](#fonctionnement)
-        * [Fichier chiffré sur le disque](#fichier-chiffré-sur-le-disque)
-        * [Synchronisation via un serveur](#synchronisation-via-un-serveur)
-        * [Solution stateless](#solution-stateless)
-        * [Basé sur un dépôt Git](#basé-sur-un-dépôt-git)
-        * [Basé sur la Blockchain](#basé-sur-la-blockchain)
-    * [Comparaison](#comparaison)
-        * [Critères](#critères)
-        * [Gestionnaires de mots de passe](#gestionnaires-de-mots-de-passe)
-        * [Conclusion](#conclusion)
+  * [Sommaire](#sommaire)
+  * [Utilité du gestionnaire de mots de passe](#utilité-du-gestionnaire-de-mots-de-passe)
+  * [Fonctionnement](#fonctionnement)
+    * [Fichier chiffré sur le disque](#fichier-chiffré-sur-le-disque)
+    * [Synchronisation via un serveur](#synchronisation-via-un-serveur)
+    * [Solution stateless](#solution-stateless)
+    * [Basé sur un dépôt Git](#basé-sur-un-dépôt-git)
+    * [Basé sur la Blockchain](#basé-sur-la-blockchain)
+  * [Comparaison](#comparaison)
+    * [Critères](#critères)
+    * [Gestionnaires de mots de passe](#gestionnaires-de-mots-de-passe)
+    * [Conclusion](#conclusion)
 
 <!-- table of contents created by Adrian Bonnet, see https://Relex12.github.io/Markdown-Table-of-Contents for more -->
 
@@ -28,7 +28,7 @@ Comparaison des gestionnaires de mots de passe existants et de leurs modes de fo
 
 [Aller à la section suivante](#fonctionnement)
 
->   Pourquoi devrais-je utiliser un gestionnaire de mots de passe ?
+> Pourquoi devrais-je utiliser un gestionnaire de mots de passe ?
 
 À l'ère d'Internet, le nombre de mots de passes utilisés par individu explose. Selon les sources, nous aurions au minimum 70 mots de passe par personne[^1]. Pourtant, nos cerveaux de primates ne sont pas adaptés pour respecter les bonnes pratiques, recommandées notamment par l'ANSSI. Que fait-on dans ce cas ? On réutilise nos mots de passe, parfois en les modifiant légèrement.
 
@@ -36,14 +36,14 @@ D'après une enquête d'Avast en 2019[^2], 93% des Français ne respectent pas l
 
 Ces bonnes pratiques[^3] sont :
 
-*   12 caractères minimum
-*   des chiffres, des lettres majuscules et minuscule et des caractères spéciaux
-*   pas de lien logique entre les caractères (dates, mots d'une langue, etc.)
-*   pas de permutation (les *E* en *3*, *a* en *@*, *o* en *0*, etc.)
+* 12 caractères minimum
+* des chiffres, des lettres majuscules et minuscule et des caractères spéciaux
+* pas de lien logique entre les caractères (dates, mots d'une langue, etc.)
+* pas de permutation (les *E* en *3*, *a* en *@*, *o* en *0*, etc.)
 
 Et le point le plus important est le suivant :
 
-*   pas de lien logique entre les mots de passe (réutilisation, modification, permutation, etc.)
+* pas de lien logique entre les mots de passe (réutilisation, modification, permutation, etc.)
 
 > Je respecte plusieurs points de la liste, ça suffit non ?
 
@@ -82,7 +82,7 @@ Tout d'abord, nous allons nous intéresser aux différents fonctionnements possi
 
 Cette partie n'est pas nécessaire si vous cherchez uniquement une alternative gratuite et facile d'accès, mais il est important de comprendre comment les gestionnaires de mots de passe fonctionnent pour ne pas faire confiance aveuglément dans une solution donnée.
 
->   Note : Dans les explications qui suivent, le fonctionnement des gestionnaires de mots de passe est simplifié, on n'abordera notamment pas les notions de salage cryptographique ou de fonction de dérivation de clé.
+> Note : Dans les explications qui suivent, le fonctionnement des gestionnaires de mots de passe est simplifié, on n'abordera notamment pas les notions de salage cryptographique ou de fonction de dérivation de clé.
 
 ### Fichier chiffré sur le disque
 
@@ -96,7 +96,7 @@ Une fois que vous avez besoin d'accéder à vos mots de passe, pour vous connect
 
 **Désavantage** :
 
-*   Vos mots de passe sont stockés sur l'espace disque d'un seul appareil, votre ordinateur ou votre smartphone. **Vous ne pouvez pas** accéder à vos mots de passe depuis un autre appareil. Notamment, **il n'y a pas de synchronisation** entre vos appareils. Cette contrainte implique que ce type de gestionnaires de mots de passe est peu utilisé dans le grand public.
+* Vos mots de passe sont stockés sur l'espace disque d'un seul appareil, votre ordinateur ou votre smartphone. **Vous ne pouvez pas** accéder à vos mots de passe depuis un autre appareil. Notamment, **il n'y a pas de synchronisation** entre vos appareils. Cette contrainte implique que ce type de gestionnaires de mots de passe est peu utilisé dans le grand public.
 
 ### Synchronisation via un serveur
 
@@ -112,8 +112,8 @@ Ici le service qui vous est vendu, c'est celui d'avoir à disposition, dans un s
 
 **Désavantages** :
 
-*   Bien sûr en tout premier, on pense au fait que cette solution soit payante, parfois assez chère. Cela constitue un énorme frein pour que le grand public adopte cette solution.
-*   En second lieu, la question de la confiance se pose, puisqu'une entreprise va avoir la main mise sur tous vos mots de passe, sous format chiffré tout de même, mais il serait audacieux d'imaginer que ce fichier est incassable.
+* Bien sûr en tout premier, on pense au fait que cette solution soit payante, parfois assez chère. Cela constitue un énorme frein pour que le grand public adopte cette solution.
+* En second lieu, la question de la confiance se pose, puisqu'une entreprise va avoir la main mise sur tous vos mots de passe, sous format chiffré tout de même, mais il serait audacieux d'imaginer que ce fichier est incassable.
 
 ### Solution stateless
 
@@ -125,8 +125,8 @@ Puisque le problème est de stocker le fichier chiffré quelque part, les soluti
 
 **Désavantages** :
 
-*   Ces solutions impliquent de changer tous vos mots de passes sur tous les sites pour utiliser le gestionnaires, puisque les mots de passe que vous utiliserez par la suite seront ceux calculés par le gestionnaire. Même si cela est souvent une bonne pratique de changer tous ses mots de passe la première fois que l'on utilise un gestionnaire de mots de passe, c'est une étape contraignante qui peut rebuter à l'utilisation grand public.
-*   Selon les services, vous pouvez avoir un seul identifiant et mot de passe pour plusieurs sites. Il faut alors se souvenir du site à utiliser pour le calcul du mot de passe. Il est également possible de configurer la complexité du mot de passe généré, mais vous devez vous souvenir de cette configuration. Pour palier à ce problème, certains services proposent de stocker votre configuration sous forme de fichier... dans leurs serveurs.
+* Ces solutions impliquent de changer tous vos mots de passes sur tous les sites pour utiliser le gestionnaires, puisque les mots de passe que vous utiliserez par la suite seront ceux calculés par le gestionnaire. Même si cela est souvent une bonne pratique de changer tous ses mots de passe la première fois que l'on utilise un gestionnaire de mots de passe, c'est une étape contraignante qui peut rebuter à l'utilisation grand public.
+* Selon les services, vous pouvez avoir un seul identifiant et mot de passe pour plusieurs sites. Il faut alors se souvenir du site à utiliser pour le calcul du mot de passe. Il est également possible de configurer la complexité du mot de passe généré, mais vous devez vous souvenir de cette configuration. Pour palier à ce problème, certains services proposent de stocker votre configuration sous forme de fichier... dans leurs serveurs.
 
 ### Basé sur un dépôt Git
 
@@ -140,7 +140,7 @@ L'utilisation de Git permet de gérer facilement les versions pour garantir la s
 
 **Désavantage** :
 
-*   Le dépôt utilisé par Git doit être accessible publiquement afin de pouvoir accéder aux mots de passe chiffrés. Cette solution suppose que vous avez accès à un tel dépôt, ce qui peut être fait soit en utilisant un dépôt sur un site public, auquel cas on retourne sur la question de la confiance, soit on configure son dépôt Git chez soi pour qu'il soit accessible depuis Internet, ce qui peut poser de gros problèmes de sécurité.
+* Le dépôt utilisé par Git doit être accessible publiquement afin de pouvoir accéder aux mots de passe chiffrés. Cette solution suppose que vous avez accès à un tel dépôt, ce qui peut être fait soit en utilisant un dépôt sur un site public, auquel cas on retourne sur la question de la confiance, soit on configure son dépôt Git chez soi pour qu'il soit accessible depuis Internet, ce qui peut poser de gros problèmes de sécurité.
 
 ### Basé sur la Blockchain
 
@@ -152,9 +152,9 @@ Il faut cependant faire attention aux solutions basées sur la Blockchain. C'est
 
 **Désavantages** :
 
-*   La Blockchain offre de la non-répudiation, c'est-à-dire que l'on garde une trace précise de qui ajoute quelle information. Vous n'êtes protégé que par l'anonymat offert par la solution, et vous devez donc leur faire confiance pour préserver cet anonymat.
-*   Par nature de la Blockchain, vos mots de passe chiffrés sont disponibles publiquement, et il serait prétentieux de penser que le fichier chiffré est incassable. De manière générale, même si vos données sont protégées par du chiffrement, il ne vaut mieux pas tenter de provoquer des attaques.
-*   Les données inscrites dans la Blockchain sont immuables, c'est-à-dire qu'une fois que vous avez écrit quelque chose dans la Blockchain, il est impossible de le modifier, de par le fonctionnement de la Blockchain. Cela ne veut pas dire que vous ne pouvez pas changer vos mots de passe, puisque vous pouvez mettre à jour le fichier chiffré aussi souvent que vous voulez, mais les données chiffrées obsolètes resteront dans la Blockchain à jamais.
+* La Blockchain offre de la non-répudiation, c'est-à-dire que l'on garde une trace précise de qui ajoute quelle information. Vous n'êtes protégé que par l'anonymat offert par la solution, et vous devez donc leur faire confiance pour préserver cet anonymat.
+* Par nature de la Blockchain, vos mots de passe chiffrés sont disponibles publiquement, et il serait prétentieux de penser que le fichier chiffré est incassable. De manière générale, même si vos données sont protégées par du chiffrement, il ne vaut mieux pas tenter de provoquer des attaques.
+* Les données inscrites dans la Blockchain sont immuables, c'est-à-dire qu'une fois que vous avez écrit quelque chose dans la Blockchain, il est impossible de le modifier, de par le fonctionnement de la Blockchain. Cela ne veut pas dire que vous ne pouvez pas changer vos mots de passe, puisque vous pouvez mettre à jour le fichier chiffré aussi souvent que vous voulez, mais les données chiffrées obsolètes resteront dans la Blockchain à jamais.
 
 ## Comparaison
 
@@ -166,20 +166,20 @@ Dans un premier temps, nous prenons pas en compte des critères trop élaborés 
 
 Voici quels sont nos critères pour cette comparaison :
 
-*   **Licence** : *propriétaire*, *freemium*, *libre*
-*   **Open source** : *oui*, *non*
-*   **Fonctionnement** : *local*, *serveur*, *stateless*, *git*, *blockchain*
-*   **OS** : *navigateur*, *Windows*, *macOS*, *Linux*, *Android*, *iOS*
-*   **Accès public au fichier chiffré** : *possible*, *connexion requise*, *impossible*
-*   **Synchronisation** :  *oui*, *non*
-*   **Vie privée** : *Compte obligatoire*, *compte facultatif*, *compte inexistant*
+* **Licence** : *propriétaire*, *freemium*, *libre*
+* **Open source** : *oui*, *non*
+* **Fonctionnement** : *local*, *serveur*, *stateless*, *git*, *blockchain*
+* **OS** : *navigateur*, *Windows*, *macOS*, *Linux*, *Android*, *iOS*
+* **Accès public au fichier chiffré** : *possible*, *connexion requise*, *impossible*
+* **Synchronisation** :  *oui*, *non*
+* **Vie privée** : *Compte obligatoire*, *compte facultatif*, *compte inexistant*
 
 Maintenant ces critères établis, passons à la comparaison à proprement parler.
 
 ### Gestionnaires de mots de passe
 
 |     Gestionnaire      |           Licence            | Open Source |     Fonctionnement     |                              OS                              |          Accès public           | Synchronisation  |        Vie privée        |
-| :-------------------: | :--------------------------: | :---------: | :--------------------: | :----------------------------------------------------------: | :-----------------------------: | :--------------: | :----------------------: |
+|:---------------------:|:----------------------------:|:-----------:|:----------------------:|:------------------------------------------------------------:|:-------------------------------:|:----------------:|:------------------------:|
 |       1Password       |         propriétaire         |     non     |        serveur         |       navigateur, Android, iOS, Linux, macOS, Windows        |            connexion            |       oui        |       obligatoire        |
 |       Bitwarden       |  libre (AGPLv3 / GNU GPLv3)  |     oui     |        serveur         |       navigateur, Android, iOS, Linux, macOS, Windows        |            connexion            |       oui        |       obligatoire        |
 |       Dashlane        |   propriétaire / freemium    |     non     |        serveur         |           navigateur, Android, iOS, macOS, Windows           |            connexion            |       oui        |       obligatoire        |

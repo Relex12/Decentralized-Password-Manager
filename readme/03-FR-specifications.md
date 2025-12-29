@@ -11,29 +11,29 @@ Spécifications de la solution retenue et des implications pratiques
 ## Sommaire
 
 * [Spécifications techniques](#spécifications-techniques)
-    * [Sommaire](#sommaire)
-    * [Terminologie](#terminologie)
-    * [Initialisation du coffre](#initialisation-du-coffre)
-        * [Enregistrement sur le serveur](#enregistrement-sur-le-serveur)
-            * [Séquence d'enregistrement](#séquence-d'enregistrement)
-            * [Fonctionnement du filtre de Bloom](#fonctionnement-du-filtre-de-bloom)
-            * [Redimensionnement du filtre de Bloom](#redimensionnement-du-filtre-de-bloom)
-        * [Découverte des clients](#découverte-des-clients)
-    * [Communications](#communications)
-        * [Communication entre clients](#communication-entre-clients)
-            * [Création d'une clé partagée](#création-d'une-clé-partagée)
-                * [Cas à deux appareils](#cas-à-deux-appareils)
-                * [Cas à trois appareils](#cas-à-trois-appareils)
-                * [Cas à $N$ appareils](#cas-à-n-appareils)
-            * [Ajout d'un nouveau client](#ajout-d'un-nouveau-client)
-            * [Format des messages](#format-des-messages)
-            * [Double Ratchet](#double-ratchet)
-        * [Communication avec le serveur](#communication-avec-le-serveur)
-            * [Stockage des messages](#stockage-des-messages)
-                * [Fonctionnement de la table de hachage](#fonctionnement-de-la-table-de-hachage)
-                * [Ajout et recherche de message](#ajout-et-recherche-de-message)
-            * [Sécurité sur la liste de messages en attente](#sécurité-sur-la-liste-de-messages-en-attente)
-            * [Chiffrement client-serveur](#chiffrement-client-serveur)
+  * [Sommaire](#sommaire)
+  * [Terminologie](#terminologie)
+  * [Initialisation du coffre](#initialisation-du-coffre)
+    * [Enregistrement sur le serveur](#enregistrement-sur-le-serveur)
+      * [Séquence d'enregistrement](#séquence-denregistrement)
+      * [Fonctionnement du filtre de Bloom](#fonctionnement-du-filtre-de-bloom)
+      * [Redimensionnement du filtre de Bloom](#redimensionnement-du-filtre-de-bloom)
+    * [Découverte des clients](#découverte-des-clients)
+  * [Communications](#communications)
+    * [Communication entre clients](#communication-entre-clients)
+      * [Création d'une clé partagée](#création-dune-clé-partagée)
+        * [Cas à deux appareils](#cas-à-deux-appareils)
+        * [Cas à trois appareils](#cas-à-trois-appareils)
+        * [Cas à $N$ appareils](#cas-à-n-appareils)
+      * [Ajout d'un nouveau client](#ajout-dun-nouveau-client)
+      * [Format des messages](#format-des-messages)
+      * [Double Ratchet](#double-ratchet)
+    * [Communication avec le serveur](#communication-avec-le-serveur)
+      * [Stockage des messages](#stockage-des-messages)
+        * [Fonctionnement de la table de hachage](#fonctionnement-de-la-table-de-hachage)
+        * [Ajout et recherche de message](#ajout-et-recherche-de-message)
+      * [Sécurité sur la liste de messages en attente](#sécurité-sur-la-liste-de-messages-en-attente)
+      * [Chiffrement client-serveur](#chiffrement-client-serveur)
 
 <!-- table of contents created by Adrian Bonnet, see https://Relex12.github.io/Markdown-Table-of-Contents for more -->
 
@@ -91,24 +91,24 @@ Soit $T$ un tableau de bits de taille $m$ dont toutes les cases sont initiées �
 
 Pour ajouter un élément dans la structure, il faut calculer successivement les $h_i$ sur cet élément pour $i$ allant de 1 à $m$ et affecter les cases correspondantes à la valeur 1.
 
-```
+```pseudo
 Fonction ajout_filtre(e)
-	Pour i de 1 à m
-		T[hi(e)] = 1
-	Fin Pour
+    Pour i de 1 à m
+        T[hi(e)] = 1
+    Fin Pour
 Fin Fonction
 ```
 
 Pour tester la présence d'un élément, il faut calculer les $h_i$ sur cet élément et vérifier que toutes les cases correspondantes ont la valeur 1. Si au moins une case est à la valeur 0, alors l'élément n'est pas présent.
 
-```
+```pseudo
 Fonction test_filtre(e)
-	Pour i de 1 à m
-		Si T[hi(e)] = 0 alors
-			Retourner Faux
-		Fin Si
-	Fin Pour
-	Retourner Vrai
+    Pour i de 1 à m
+        Si T[hi(e)] = 0 alors
+            Retourner Faux
+        Fin Si
+    Fin Pour
+    Retourner Vrai
 Fin Fonction
 ```
 
@@ -123,7 +123,7 @@ La valeur de $k$ qui minimise le taux de faux positifs est $k=\frac m n \ln2$. E
 Dans notre cas d'usage, il faudrait conserver une probabilité de faux positifs $\epsilon$ inférieure à 0.1%, afin de dissuader les attaques par force brute. Le nombre d'entrées dans la structure $n$ peut raisonnablement valoir 1000 pendant le développement, 1 millions en cas de succès du gestionnaire de mots de passe et 1 milliards en cas d'utilisation massive par de très nombreux utilisateurs.
 
 | valeurs pour $\epsilon=10^{-4}$                      | $n=10^3$ |  $n=10^6$  |    $n=10^9$    |
-| ---------------------------------------------------- | :------: | :--------: | :------------: |
+|------------------------------------------------------|:--------:|:----------:|:--------------:|
 | $m$ taille en bits du tableau                        |  19200   | 19 200 000 | 19 200 000 000 |
 | $k$ nombre de fonctions de hachage                   |   13.3   |    13.3    |      13.3      |
 | $\log_2(m)$ longueur en bit des fonctions de hachage |   14.2   |    24.2    |      34.2      |
@@ -138,8 +138,8 @@ Lorsque le nombre d'entrée dans le filtre de Bloom augmente au delà de ce qui 
 Lorsque cela se produit, le serveur doit conserver deux versions du filtre de Bloom pendant une durée assez longue de transition. Pendant toute cette durée de transition, lorsque le serveur reçoit un message de la part d'un client, il doit procéder aux étapes suivantes :
 
 1. si le client est enregistré dans le nouveau filtre de Bloom alors rien (le client a déjà été enregistré dans la nouvelle table, le message est accepté et placé en attente de livraison) ;
-1. sinon si le client est enregistré dans l'ancien filtre de Bloom alors le serveur l'enregistre également dans le nouveau (le message est accepté et placé en attente) ;
-1. sinon le client est challengé avant d'être ajouté au nouveau filtre de Bloom (c'est un nouveau client, voir séquence d'enregistrement).
+2. sinon si le client est enregistré dans l'ancien filtre de Bloom alors le serveur l'enregistre également dans le nouveau (le message est accepté et placé en attente) ;
+3. sinon le client est challengé avant d'être ajouté au nouveau filtre de Bloom (c'est un nouveau client, voir séquence d'enregistrement).
 
 La durée de transition n'a pas de valeur précise définie à l'avance. Elle doit être ajustée afin de permettre que le plus grand nombre d'utilisateurs puisse s'enregistrer sur les deux serveurs. Pour cela, il sera nécessaire de conserver en mémoire le nombre de clients présents dans chaque table, ainsi que pour la durée de transition, le nombre de clients importés depuis l'ancienne table vers la nouvelle via le point numéro 2 ci-dessus. Lorsqu'une proportion satisfaisante de clients ont été transférés vers la nouvelle table, la durée de transition peut prendre fin.
 
@@ -166,31 +166,29 @@ L'opération de découverte des clients est censée être synchrone. Lorsqu'un a
 L'utilisateur doit donc relier ses appareils entre eux en plus de les enregistrer auprès du serveur. Chaque appareil doit découvrir chaque autre manuellement, il y a pour cela trois procédures :
 
 * **méthode diffusion** : chaque appareil envoie toutes les identités qu'il connait à tous les appareils qu'il ne connait pas encore, chaque appareil répond toutes les identités qu'il connait et que l'autre appareil ne connait pas
-
-	![diffusion discovery diagram](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/03-diffusion-discovery-diagram.png)
-
-	* *point négatif* : de nombreux messages sont inutiles
-	* *point négatif* : le très grand nombre d'échanges nécessaires, $n(n-1)$ pour $n$ appareils
-	* *point négatif* : les échanges doivent être bidirectionnels
-	* *point positif* : les échanges peuvent être réalisés dans n'importe quel ordre
-
+  
+    ![diffusion discovery diagram](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/03-diffusion-discovery-diagram.png)
+  
+  * *point négatif* : de nombreux messages sont inutiles
+  * *point négatif* : le très grand nombre d'échanges nécessaires, $n(n-1)$ pour $n$ appareils
+  * *point négatif* : les échanges doivent être bidirectionnels
+  * *point positif* : les échanges peuvent être réalisés dans n'importe quel ordre
 
 * **méthode circulaire** : le premier appareil envoie son identité au deuxième, le deuxième envoie son identité et celle du premier au troisième, etc., jusqu'au dernier qui envoie toutes les identités au premier
-
-	![circular discovery diagram](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/03-circular-discovery-diagram.png)
-
-	* *point négatif* : les échanges doivent être réalisés dans un ordre précis
-	* *point positif* : le faible nombre d'échanges nécessaires, $n$ pour $n$ appareils
-	* *point positif* : les échanges peuvent être unidirectionnels
-
+  
+    ![circular discovery diagram](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/03-circular-discovery-diagram.png)
+  
+  * *point négatif* : les échanges doivent être réalisés dans un ordre précis
+  * *point positif* : le faible nombre d'échanges nécessaires, $n$ pour $n$ appareils
+  * *point positif* : les échanges peuvent être unidirectionnels
 
 * **méthode maître** : dans un premier temps un appareil maître reçoit l'identité de chaque autre, ensuite le maître envoie toutes les identités à chacun
-
-	![master discovery diagram](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/03-master-discovery-diagram.png)
-
-	* *point négatif* : le nombre d'échanges nécessaires, $2(n-1)$ pour $n$ appareils
-	* *point positif* : les échanges peuvent être unidirectionnels
-	* *point positif* : les échanges peuvent être réalisés dans n'importe quel ordre
+  
+    ![master discovery diagram](https://raw.githubusercontent.com/Relex12/Decentralized-Password-Manager/master/img/03-master-discovery-diagram.png)
+  
+  * *point négatif* : le nombre d'échanges nécessaires, $2(n-1)$ pour $n$ appareils
+  * *point positif* : les échanges peuvent être unidirectionnels
+  * *point positif* : les échanges peuvent être réalisés dans n'importe quel ordre
 
 À noter que pour faire se découvrir deux appareils, l'utilisateur doit manipuler les deux en même temps, c'est donc une opération peu ergonomique. Pour minimiser le nombre transmissions à effectuer, la deuxième méthode est plus efficace, $n$ messages pour $n$ appareils contre $n(n-1)$ et $2(n-1)$. Mais la troisième méthode est plus pratique à utiliser car les échanges n'ont pas d'ordre précis et que le fonctionnement ne dépend pas du nombre d'appareils. Pour d'autres raisons, notamment la gestion des clients d'un coffre, il serait avantageux d'avoir recours à un appareil maître pour chaque coffre. Les clients pourront également supporter les autres méthodes qui pourront être réalisées entièrement ou en partie.
 
@@ -302,6 +300,7 @@ Pour ajouter une valeur $v$ associée à une clé $c$ dans la table, il faut cal
 En raison de l'utilisation d'une fonction de hachage cryptographique, comme pour le filtre de Bloom, il est possible d'avoir des collisions, c'est-à-dire que deux identifiants d'enregistrement soient associées via la fonction de hachage à la même case dans la table. Pour contourner ce problème, il existe deux solutions :
 
 * l'**adressage ouvert** : la nouvelle valeur est stockée à une autre endroit dans la table, la méthode pour trouver ce nouvel endroit s'appelle un sondage, qui peut être :
+  
   * linéaire : $h_{i+1}(c) = h_i(c)+A, A\in\mathbb N$
   * quadratique : $h_i(c) = (h(c)+(-1)^{i+1}.\lceil\frac i2\rceil^2)\bmod m$
   * en double hachage : $h_{i+1}(c) = h(h_i(c))$
@@ -313,7 +312,7 @@ L'adressage ouvert ne permet pas suppression des valeurs après ajout, sinon lor
 Or la recherche dans une liste est moins efficace que dans une table de hachage. Si la table contient trop de collisions, les listes chaînées de chaque case de la table s'allongent et la recherche prend plus de temps. Tant que la répartition est uniforme et que la moyenne du nombre de collisions est relativement basse, ce n'est pas un problème. Le facteur de charge $\frac nm$ est un indicateur de la probabilité de collision d'une nouvelle entrée, si ce facteur est proche ou supérieur à 1, les nouvelles collisions sont systématiques ou presque, alors il faut agrandir la table.
 
 | $k=32\ bits$ et $n=10^6$                              | $\frac nm = 0.1$ | $\frac nm = 0.25$ | $\frac nm = 0.5$ | $\frac nm = 0.80$ | $\frac nm = 1$ |
-| ----------------------------------------------------- | :--------------: | :---------------: | :--------------: | :---------------: | :------------: |
+|-------------------------------------------------------|:----------------:|:-----------------:|:----------------:|:-----------------:|:--------------:|
 | $\log_2(m)$ longueur en bit de la fonction de hachage |        13        |        12         |        11        |        10         |       10       |
 | $m\times k$ taille de la table de hachage             |      38 Mo       |       15 Mo       |       8 Mo       |       5 Mo        |      4 Mo      |
 
@@ -337,7 +336,7 @@ typedef struct stack stack;
 struct stack
 {
     void* messages;
-	void* register_id;
+    void* register_id;
     stack* next;
 };
 
@@ -352,34 +351,34 @@ Lorsque la table de hachage doit être agrandie, comme pour le filtre de Bloom, 
 
 Lorsque le serveur reçoit un message à délivrer, il l'enregistre dans la liste de tous les messages en attente, puis il ajoute l'adresse du message dans la table de hachage pour chaque destinataire.
 
-```
+```pseudo
 Fonction ajout_message(message)
-	Pour dest parmi message.destinataires
-		Si test_filtre(dest) alors
-			ajout_hashtable(dest, &message)
-		Fin Si
-	Fin Pour
+    Pour dest parmi message.destinataires
+        Si test_filtre(dest) alors
+            ajout_hashtable(dest, &message)
+        Fin Si
+    Fin Pour
 Fin Fonction
 ```
 
 Lorsque le serveur reçoit une requête d'envoi de messages en attente, il récupère la liste des messages en attente dans la table de hachage et les transmet au client. La liste des messages récupérée peut être vide, auquel cas le client n'a pas de message en attente. Si elle n'est pas vide, pour chaque message dans la liste, le client est retiré de la liste des destinataires. Si la liste de destinataires est vide après cela, le message est supprimé. Si l'un message a été supprimé avant récupération par le client à cause de la date de péremption, le serveur précise au client que l'utilisateur doit réaliser une synchronisation manuelle à partir d'un appareil à jour.
 
-```
+```pseudo
 Fonction recherche_messages(cle)
-	messages = recherche_hashtable(cle)
-	Si messages n'est pas vide alors
-		Pour message dans messages
-			Si message est accessible alors
+    messages = recherche_hashtable(cle)
+    Si messages n'est pas vide alors
+        Pour message dans messages
+            Si message est accessible alors
                 retirer(message.destinataires, cle)
                 Si message.destinataires est vide
-                	supprimer(message)
-				Fin Si
+                    supprimer(message)
+                Fin Si
             Sinon
-            	nouveau_message("Synchronisation manuelle requise")
-			Fin Si
-		Fin Pour
-	Fin Si
-	Retourner messages
+                nouveau_message("Synchronisation manuelle requise")
+            Fin Si
+        Fin Pour
+    Fin Si
+    Retourner messages
 Fin Fonction
 ```
 
